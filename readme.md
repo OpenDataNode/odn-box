@@ -12,7 +12,7 @@ Usage: apt-get install odn-simple
 Till the package repository will be established use this
 
 ~~~bash
-# dpkg -i odn-ckan-shared_2.2.1-1_amd64.deb  odn-simple_0.9-1_amd64.deb  odn-solr_0.9-1_amd64.deb
+# dpkg -i odn-ckan-shared_2.2.1-1_amd64.deb  odn-simple_0.9-1_amd64.deb  odn-solr_4.10.2-1_all.deb
 ... some dependency errors
 # apt-get install -f -y
 ~~~

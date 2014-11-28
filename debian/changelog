@@ -1,4 +1,11 @@
-odn (0.9-1) unstable; urgency=low
+odn-box (0.9-2) unstable; urgency=low
+
+  * ODN Solr split to separate package
+
+ -- jko <jko@wheezy.kotlar.local>  Fri, 28 Nov 2014 09:05:18 +0100
+
+
+odn-box (0.9-1) unstable; urgency=low
 
   * Initial release.
 

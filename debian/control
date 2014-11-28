@@ -1,22 +1,14 @@
-Source: odn
+Source: odn-box
 Maintainer: Someone FIXME <dev@opendata.sk>
 Standards-Version: 3.9.3
 Build-Depends: debhelper (>= 9)
 Homepage: http://opendata.sk
-Vcs-Git: https://github.com/OpenDataSk/odn-packaging.git
-
-Package: odn-solr
-Architecture: any
-Priority: extra
-Section: web
-Depends: openjdk-7-jre-headless, solr-jetty
-Description: OpenData Node - SOLR customization
- Prepares two cores for CKAN.
+Vcs-Git: https://github.com/OpenDataNode/odn-box.git
 
 Package: odn-simple
 Architecture: any
 Priority: extra
 Section: web
-Depends: odn-solr, odn-ckan-shared, postgresql, apache2-mpm-worker, libapache2-mod-wsgi
+Depends: odn-solr, odn-ckan | odn-ckan-shared, postgresql, apache2-mpm-worker, libapache2-mod-wsgi
 Description: OpenData Node - all-in-one installation
  Simple installation for previewing and low traffic usages.

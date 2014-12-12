@@ -71,6 +71,10 @@ case "$1" in
     wsgi_configure odn-ckan-pc
     a2dissite default
     a2ensite odn-simple
+	a2enmod proxy 
+	a2enmod proxy_html
+	a2enmod proxy_connect
+	a2enmod rewrite	
     apache_reload
   ;;
 

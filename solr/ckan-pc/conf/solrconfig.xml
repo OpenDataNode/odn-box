@@ -114,7 +114,7 @@
        replication is in use, this should match the replication
        configuration.
     -->
-  <dataDir>/var/lib/solr/ckan-pc/data</dataDir>
+  <dataDir>/var/lib/odn-solr/ckan-pcdata</dataDir>
 
 
   <!-- The DirectoryFactory to use for indexes.

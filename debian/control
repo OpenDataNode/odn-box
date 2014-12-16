@@ -6,7 +6,7 @@ Homepage: http://opendata.sk
 Vcs-Git: https://github.com/OpenDataNode/odn-box.git
 
 Package: odn-simple
-Architecture: any
+Architecture: all
 Priority: extra
 Section: web
 Depends: odn-solr, odn-ckan | odn-ckan-shared, postgresql, apache2-mpm-worker, libapache2-mod-wsgi

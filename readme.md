@@ -12,10 +12,22 @@ Usage: apt-get install odn-simple
 Till the package repository will be established use this
 
 ~~~bash
-dpkg -i odn-solr_4.10.2-1_all.deb odn-ckan-shared_2.2.1-1_amd64.deb odn-simple_0.9-2_amd64.deb
+dpkg -i odn-solr_4.10.2-1_all.deb 
 #... some dependency errors
 apt-get install -f -y
 ~~~
+~~~bash
+dpkg -i odn-ckan-shared_2.2.1-1_amd64.deb 
+#... some dependency errors
+apt-get install -f -y
+~~~
+~~~bash
+dpkg -i  odn-simple_0.9-2_all.deb
+#... some dependency errors
+apt-get install -f -y
+~~~
+
+
 
 To add sysadmin user run:
 ~~~bash

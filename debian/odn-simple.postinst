@@ -67,8 +67,15 @@ case "$1" in
     db_configure odn-ckan-ic odn
     wsgi_configure odn-ckan-ic
     pipeline_configure odn-ckan-ic
-    db_configure odn-ckan-pc odn
-    wsgi_configure odn-ckan-pc
+    # dont run public catalog in v0.9.0
+    #db_configure odn-ckan-pc odn
+    #wsgi_configure odn-ckan-pc
+    a2dissite default
+    a2ensite odn-simple
+	a2enmod proxy 
+	a2enmod proxy_http
+	a2enmod proxy_connect
+	a2enmod rewrite	
     apache_reload
   ;;
 

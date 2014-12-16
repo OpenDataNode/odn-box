@@ -1,3 +1,6 @@
 ckan-ic/* etc/odn-simple/odn-ckan-ic/
 ckan-pc/* etc/odn-simple/odn-ckan-pc/
 solr/* etc/odn-solr/solr/
+publication/sparql/* var/www/sparql/
+publication/dump/* var/www/dump/
+apache/*  etc/odn-simple/

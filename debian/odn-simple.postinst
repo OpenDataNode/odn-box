@@ -62,6 +62,10 @@ apache_reload() {
 
 case "$1" in
   configure)
+    service odn-solr restart
+    echo "wait for restart"
+    # TODO think about clever waiting
+    sleep 10
     default_java
     db_up
     db_configure odn-ckan-ic odn

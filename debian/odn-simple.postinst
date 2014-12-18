@@ -62,13 +62,25 @@ apache_reload() {
 
 case "$1" in
   configure)
+    service odn-solr restart
+    echo "wait for restart"
+    # TODO think about clever waiting
+    sleep 10
     default_java
     db_up
     db_configure odn-ckan-ic odn
     wsgi_configure odn-ckan-ic
     pipeline_configure odn-ckan-ic
-    db_configure odn-ckan-pc odn
-    wsgi_configure odn-ckan-pc
+    # dont run public catalog in v0.9.0
+    #db_configure odn-ckan-pc odn
+    #wsgi_configure odn-ckan-pc
+    a2dissite default
+    a2ensite odn-simple
+	a2enmod proxy 
+	a2enmod proxy_http
+	a2enmod proxy_connect
+    a2enmod wsgi
+	a2enmod rewrite	
     apache_reload
   ;;
 

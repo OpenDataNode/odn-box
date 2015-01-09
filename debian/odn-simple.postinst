@@ -78,7 +78,7 @@ case "$1" in
     pipeline_configure odn-ckan-ic
     db_configure odn-ckan-pc odn
     wsgi_configure odn-ckan-pc
-    ckan_plugin_sync_confgure odn-ckan-pc
+    ckan_plugin_sync_confgure odn-ckan-ic
     a2dissite default
     a2ensite odn-simple
 	a2enmod proxy 

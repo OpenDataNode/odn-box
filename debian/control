@@ -1,10 +1,10 @@
-Source: odn-box
+Source: odn-simple
 Maintainer: Someone FIXME <dev@opendata.sk>
 Standards-Version: 3.9.3
 Build-Depends: debhelper (>= 9)
 Homepage: http://opendata.sk
 Vcs-Git: https://github.com/OpenDataNode/odn-box.git
-Version: 0.10.0
+Version: 0.10.0-SNAPSHOT
 
 Package: odn-simple
 Architecture: all

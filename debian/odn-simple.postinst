@@ -5,7 +5,7 @@ set -e
 
 db_creadentials(){
     db_get ckan/hostname
-    HOST=$RET
+    HOSTNAME=$RET
 }
 
 

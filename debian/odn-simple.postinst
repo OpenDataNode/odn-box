@@ -1,6 +1,14 @@
 #!/bin/sh
 set -e
 
+. /usr/share/debconf/confmodule
+
+db_creadentials(){
+    db_get ckan/hostname
+    HOST=$RET
+}
+
+
 default_java() {
   /usr/sbin/update-java-alternatives --jre-headless --set java-1.7.0-openjdk-amd64
 }
@@ -71,8 +79,17 @@ apache_reload() {
   service apache2 reload
 }
 
+set_ckans_hostname() {
+   site=$1
+    sed --in-place \
+        -e "s/HOSTNAME/$HOSTNAME/" \
+         /etc/odn-simple/${site}/production.ini
+}
+
 case "$1" in
   configure)
+    db_creadentials
+    set_ckans_hostname odn-ckan-ic
     service odn-solr restart
     echo "wait for restart"
     # TODO think about clever waiting

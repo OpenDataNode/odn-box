@@ -82,7 +82,7 @@ apache_reload() {
 set_ckans_hostname() {
    site=$1
     sed --in-place \
-        -e "s/HOSTNAME/$HOSTNAME/" \
+        -e "s/\$HOSTNAME/$HOSTNAME/" \
          /etc/odn-simple/${site}/production.ini
 }
 

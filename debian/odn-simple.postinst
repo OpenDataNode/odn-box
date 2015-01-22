@@ -63,20 +63,6 @@ ckan_plugin_sync_confgure() {
   /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckanext-odn-ic2pc-sync odn_ic2pc_sync_cmd initdb -c /etc/odn-simple/${site}/production.ini   
 }
 
-
-ckan_plugin_sync_migrate() {
-  site=$1
-  version=$2
-  # migration from v0.2.0 to 0.3.0
-  if [ -n  "$version" ] 
-  then
-    echo -n "INFO: Migrate ckanext-odn-ic2pc-sync"
-    /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckanext-odn-ic2pc-sync odn_ic2pc_sync_cmd migrate_to_v0.3.0 --config=/etc/odn-simple/${site}/production.ini   
-  fi
- 
- }
-
-
 wsgi_configure() {
   site=$1
   /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckan db init -c /etc/odn-simple/${site}/production.ini
@@ -116,7 +102,6 @@ case "$1" in
     db_configure odn-ckan-pc odn
     wsgi_configure odn-ckan-pc
     ckan_plugin_sync_confgure odn-ckan-ic
-    ckan_plugin_sync_migrate odn-ckan-ic $2 
     add_user odn-ckan-ic
     add_user odn-ckan-pc
     a2dissite default

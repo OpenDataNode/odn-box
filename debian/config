@@ -1,0 +1,7 @@
+#!/bin/sh
+set -e
+. /usr/share/debconf/confmodule
+
+db_input critical ckan/hostname || true
+db_go
+

@@ -65,6 +65,7 @@ ckan_plugin_sync_confgure() {
 
 wsgi_configure() {
   site=$1
+   echo -n "INFO: Ckan db init "${site}
   /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckan db init -c /etc/odn-simple/${site}/production.ini
   a2ensite ${site}
 }

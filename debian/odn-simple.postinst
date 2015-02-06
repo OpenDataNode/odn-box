@@ -127,6 +127,7 @@ case "$1" in
     a2enmod wsgi
 	a2enmod rewrite	
     apache_restart
+    db_stop
   ;;
 
   abort-upgrade|abort-remove|abort-deconfigure)

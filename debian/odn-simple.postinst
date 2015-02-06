@@ -76,8 +76,14 @@ add_user() {
    /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckan sysadmin  add  admin -c   /etc/odn-simple/${site}/production.ini  || true
 }
 
-apache_reload() {
-  service apache2 restart
+apache_restart() {
+    if [ -x "/etc/init.d/apache2" ]; then
+            if [ -x /usr/sbin/invoke-rc.d ]; then
+                    invoke-rc.d apache2 restart || true
+            else
+                    /etc/init.d/apache2 restart || true
+            fi
+    fi
 }
 
 set_ckans_hostname() {
@@ -120,7 +126,8 @@ case "$1" in
 	a2enmod proxy_connect
     a2enmod wsgi
 	a2enmod rewrite	
-    apache_reload
+    apache_restart
+    db_stop
   ;;
 
   abort-upgrade|abort-remove|abort-deconfigure)

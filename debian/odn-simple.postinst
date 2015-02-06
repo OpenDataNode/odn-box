@@ -77,7 +77,7 @@ add_user() {
 }
 
 apache_reload() {
-  service apache2 reload
+  service apache2 restart
 }
 
 set_ckans_hostname() {
@@ -86,6 +86,13 @@ set_ckans_hostname() {
         -e "s/\$HOSTNAME/$HOSTNAME/" \
          /etc/odn-simple/${site}/production.ini
 }
+
+run_ckan_internationalization() {
+    . /usr/share/python/odn-ckan-shared/bin/activate
+    python /etc/odn-simple/odn-ckan-commons/odn_i18n.py
+    deactivate
+}
+
 
 case "$1" in
   configure)
@@ -105,6 +112,7 @@ case "$1" in
     ckan_plugin_sync_confgure odn-ckan-ic
     add_user odn-ckan-ic
     add_user odn-ckan-pc
+    run_ckan_internationalization
     a2dissite default
     a2ensite odn-simple
 	a2enmod proxy 

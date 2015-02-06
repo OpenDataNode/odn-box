@@ -10,6 +10,6 @@ Package: odn-simple
 Architecture: all
 Priority: extra
 Section: web
-Depends: unifiedviews-backend-pgsql, unifiedviews-webapp-pgsql, unifiedviews-backend (>> 1.5.0-1), unifiedviews-webapp (>> 1.5.0), odn-solr, odn-ckan | odn-ckan-shared, postgresql, apache2-mpm-worker, libapache2-mod-wsgi
+Depends: unifiedviews-backend-pgsql, unifiedviews-webapp-pgsql, unifiedviews-backend (>> 1.5.0-1), unifiedviews-webapp (>> 1.5.0), odn-solr, odn-ckan | odn-ckan-shared, postgresql, apache2-mpm-worker, libapache2-mod-wsgi, python-pip, gettext
 Description: OpenData Node - all-in-one installation
  Simple installation for previewing and low traffic usages.

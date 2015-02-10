@@ -1,6 +1,14 @@
 #!/bin/sh
 set -e
 
+. /usr/share/debconf/confmodule
+
+db_creadentials(){
+    db_get ckan/hostname
+    HOSTNAME=$RET
+}
+
+
 default_java() {
   /usr/sbin/update-java-alternatives --jre-headless --set java-1.7.0-openjdk-amd64
 }
@@ -50,18 +58,52 @@ pipeline_configure() {
   /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckanext-odn-pipeline pipeline-cmd initdb -c /etc/odn-simple/${site}/production.ini
 }
 
+ckan_plugin_sync_confgure() {
+  site=$1
+  /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckanext-odn-ic2pc-sync odn_ic2pc_sync_cmd initdb -c /etc/odn-simple/${site}/production.ini   
+}
+
 wsgi_configure() {
   site=$1
+   echo -n "INFO: Ckan db init "${site}
   /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckan db init -c /etc/odn-simple/${site}/production.ini
   a2ensite ${site}
 }
 
-apache_reload() {
-  service apache2 reload
+add_user() {
+   site=$1
+   /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckan user add admin password=admin email=admin@opendata.gov -c /etc/odn-simple/${site}/production.ini || true
+   /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckan sysadmin  add  admin -c   /etc/odn-simple/${site}/production.ini  || true
 }
+
+apache_restart() {
+    if [ -x "/etc/init.d/apache2" ]; then
+            if [ -x /usr/sbin/invoke-rc.d ]; then
+                    invoke-rc.d apache2 restart || true
+            else
+                    /etc/init.d/apache2 restart || true
+            fi
+    fi
+}
+
+set_ckans_hostname() {
+   site=$1
+    sed --in-place \
+        -e "s/\$HOSTNAME/$HOSTNAME/" \
+         /etc/odn-simple/${site}/production.ini
+}
+
+run_ckan_internationalization() {
+    . /usr/share/python/odn-ckan-shared/bin/activate
+    python /etc/odn-simple/odn-ckan-commons/odn_i18n.py
+    deactivate
+}
+
 
 case "$1" in
   configure)
+    db_creadentials
+    set_ckans_hostname odn-ckan-ic
     service odn-solr restart
     echo "wait for restart"
     # TODO think about clever waiting
@@ -71,9 +113,12 @@ case "$1" in
     db_configure odn-ckan-ic odn
     wsgi_configure odn-ckan-ic
     pipeline_configure odn-ckan-ic
-    # dont run public catalog in v0.9.0
-    #db_configure odn-ckan-pc odn
-    #wsgi_configure odn-ckan-pc
+    db_configure odn-ckan-pc odn
+    wsgi_configure odn-ckan-pc
+    ckan_plugin_sync_confgure odn-ckan-ic
+    add_user odn-ckan-ic
+    add_user odn-ckan-pc
+    run_ckan_internationalization
     a2dissite default
     a2ensite odn-simple
 	a2enmod proxy 
@@ -81,7 +126,8 @@ case "$1" in
 	a2enmod proxy_connect
     a2enmod wsgi
 	a2enmod rewrite	
-    apache_reload
+    apache_restart
+    db_stop
   ;;
 
   abort-upgrade|abort-remove|abort-deconfigure)

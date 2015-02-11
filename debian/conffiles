@@ -1,5 +1,5 @@
-etc/odn-simple/odn-ckan-ic/apache.conf
-etc/odn-simple/odn-ckan-pc/apache.conf
-etc/odn-simple/odn-simple-apache.conf 
-etc/odn-simple/odn-ckan-ic/production.ini
-etc/odn-simple/odn-ckan-pc/production.ini
+/etc/odn-simple/odn-ckan-ic/apache.conf
+/etc/odn-simple/odn-ckan-pc/apache.conf
+/etc/odn-simple/odn-simple-apache.conf 
+/etc/odn-simple/odn-ckan-ic/production.ini
+/etc/odn-simple/odn-ckan-pc/production.ini

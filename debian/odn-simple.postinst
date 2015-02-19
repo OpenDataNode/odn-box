@@ -94,7 +94,6 @@ run_ckan_internationalization() {
 
 case "$1" in
   configure)
-    db_creadentials
     set_ckans_hostname odn-ckan-ic
     service odn-solr restart
     echo "wait for restart"

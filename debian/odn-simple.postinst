@@ -1,14 +1,6 @@
 #!/bin/sh
 set -e
 
-. /usr/share/debconf/confmodule
-
-db_creadentials(){
-    db_get ckan/hostname
-    HOSTNAME=$RET
-}
-
-
 default_java() {
   /usr/sbin/update-java-alternatives --jre-headless --set java-1.7.0-openjdk-amd64
 }
@@ -102,7 +94,6 @@ run_ckan_internationalization() {
 
 case "$1" in
   configure)
-    db_creadentials
     set_ckans_hostname odn-ckan-ic
     service odn-solr restart
     echo "wait for restart"
@@ -127,7 +118,6 @@ case "$1" in
     a2enmod wsgi
 	a2enmod rewrite	
     apache_restart
-    db_stop
   ;;
 
   abort-upgrade|abort-remove|abort-deconfigure)

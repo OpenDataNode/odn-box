@@ -1,14 +1,6 @@
 #!/bin/sh
 set -e
 
-. /usr/share/debconf/confmodule
-
-db_creadentials(){
-    db_get ckan/hostname
-    HOSTNAME=$RET
-}
-
-
 default_java() {
   /usr/sbin/update-java-alternatives --jre-headless --set java-1.7.0-openjdk-amd64
 }
@@ -127,7 +119,6 @@ case "$1" in
     a2enmod wsgi
 	a2enmod rewrite	
     apache_restart
-    db_stop
   ;;
 
   abort-upgrade|abort-remove|abort-deconfigure)

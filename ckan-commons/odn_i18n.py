@@ -18,6 +18,8 @@ Created on 26.1.2015
 '''
 import pip
 import os
+import sys, getopt
+import argparse
 
 extension_string = 'ckanext-odn-'  # the odn extension identification string
 i18n_dir = 'ckanext/i18n'  # the dir where the localizations are in the extension
@@ -103,9 +105,25 @@ class Localization():
         return self.__str__()
 
 
-if __name__ == '__main__':
+def main():
+    description = 'This script takes .po files for each localization from INSTALLED extensions and\
+    first merges it with INSTALLED ckan .po file and compiles it. After this script is run\
+    the application server needs to be restarted. \
+    The extension need to have the localization in path: \
+   {CKANEXT_EGG_PATH}/ckanext/i18n/{LOCALE}/LC_MESSAGES/*.po \
+    this .po files can be generated through babel module \
+    the {LOCALE} should be the localization string e.g. fr'
+
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument('--translation_path', dest='translation_path', help='Where file *.po is placed', required=True)
+
+    args = parser.parse_args()
+    if not os.path.isfile(args.translation_path):
+        print 'file is not existed: ' + args.translation_path
+        return -1
+
     ckan_i18n_paths = []
-    to_merge_localizations = {}
+    to_merge_localizations = {'sk': [str(args.translation_path)]}
 
     for distr in pip.get_installed_distributions():
         path = distr.location
@@ -127,3 +145,7 @@ if __name__ == '__main__':
     else:
         for ckan_path in ckan_i18n_paths:
             install_localization(ckan_path, to_merge_localizations)
+
+
+if __name__ == "__main__":
+    main()

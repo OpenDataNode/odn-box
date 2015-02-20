@@ -115,12 +115,15 @@ def main():
     the {LOCALE} should be the localization string e.g. fr'
 
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('--translation_path', dest='translation_path', help='Dir where *.po is placed', required=True)
+    parser.add_argument('--translation_path', dest='translation_path', help='Where file *.po is placed', required=True)
 
     args = parser.parse_args()
+    if not os.path.isfile(args.translation_path):
+        print 'file is not existed: ' + args.translation_path
+        return -1
 
     ckan_i18n_paths = []
-    to_merge_localizations = {}
+    to_merge_localizations = {'sk': [str(args.translation_path)]}
 
     for distr in pip.get_installed_distributions():
         path = distr.location
@@ -134,12 +137,6 @@ def main():
         if 'ckan' == name:
             ckan_i18n_paths.append(ckan_i18n_path.format(CKAN_PATH=path))
             print 'CKAN found: {0} : {1}'.format(name, version)
-
-    translations = os.listdir(args.translation_path)
-    for translation in translations:
-        absolute_path = os.path.join(args.translation_path, translation)
-        find_po_files(translation, to_merge_localizations)
-        print 'Customized translation found {0}'.format(absolute_path)
 
     if len(to_merge_localizations) == 0:
         print "No extension found starting '{0}'".format(extension_string)

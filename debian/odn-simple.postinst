@@ -87,7 +87,7 @@ set_ckans_hostname() {
 
 run_ckan_internationalization() {
     . /usr/share/python/odn-ckan-shared/bin/activate
-    python /etc/odn-simple/odn-ckan-commons/odn_i18n.py --translation_path /etc/odn-simple/odn-ckan-commons/translate/
+    python /etc/odn-simple/odn-ckan-commons/odn_i18n.py --translation_path /etc/odn-simple/odn-ckan-commons/translations
     deactivate
 }
 

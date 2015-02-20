@@ -115,37 +115,41 @@ def main():
     the {LOCALE} should be the localization string e.g. fr'
 
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('--translation_path', dest='translation_path', help='Where file *.po is placed', required=True)
+    parser.add_argument('--translation_file', dest='translation_file', help='Where file *.po is placed', required=True,
+                        type=file)
 
-    args = parser.parse_args()
-    if not os.path.isfile(args.translation_path):
-        print 'file is not existed: ' + args.translation_path
+    try:
+        args = parser.parse_args()
+
+        ckan_i18n_paths = []
+        to_merge_localizations = {'sk': [str(args.translation_file.name)]}
+
+        for distr in pip.get_installed_distributions():
+            path = distr.location
+            version = distr.version
+            name = distr.key
+
+            if extension_string in name:
+                find_po_files(path, to_merge_localizations)
+                print 'odn ckanext found: {0} : {1}'.format(name, version)
+
+            if 'ckan' == name:
+                ckan_i18n_paths.append(ckan_i18n_path.format(CKAN_PATH=path))
+                print 'CKAN found: {0} : {1}'.format(name, version)
+
+        if len(to_merge_localizations) == 0:
+            print "No extension found starting '{0}'".format(extension_string)
+        elif len(ckan_i18n_paths) == 0:
+            print "No CKAN found"
+        else:
+            for ckan_path in ckan_i18n_paths:
+                install_localization(ckan_path, to_merge_localizations)
+
+    except Exception as e:
+        print e
         return -1
 
-    ckan_i18n_paths = []
-    to_merge_localizations = {'sk': [str(args.translation_path)]}
-
-    for distr in pip.get_installed_distributions():
-        path = distr.location
-        version = distr.version
-        name = distr.key
-
-        if extension_string in name:
-            find_po_files(path, to_merge_localizations)
-            print 'odn ckanext found: {0} : {1}'.format(name, version)
-
-        if 'ckan' == name:
-            ckan_i18n_paths.append(ckan_i18n_path.format(CKAN_PATH=path))
-            print 'CKAN found: {0} : {1}'.format(name, version)
-
-    if len(to_merge_localizations) == 0:
-        print "No extension found starting '{0}'".format(extension_string)
-    elif len(ckan_i18n_paths) == 0:
-        print "No CKAN found"
-    else:
-        for ckan_path in ckan_i18n_paths:
-            install_localization(ckan_path, to_merge_localizations)
-
+    return 0
 
 if __name__ == "__main__":
     main()

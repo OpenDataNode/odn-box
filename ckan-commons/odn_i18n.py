@@ -18,6 +18,8 @@ Created on 26.1.2015
 '''
 import pip
 import os
+import sys, getopt
+import argparse
 
 extension_string = 'ckanext-odn-'  # the odn extension identification string
 i18n_dir = 'ckanext/i18n'  # the dir where the localizations are in the extension
@@ -103,7 +105,20 @@ class Localization():
         return self.__str__()
 
 
-if __name__ == '__main__':
+def main():
+    description = 'This script takes .po files for each localization from INSTALLED extensions and\
+    first merges it with INSTALLED ckan .po file and compiles it. After this script is run\
+    the application server needs to be restarted. \
+    The extension need to have the localization in path: \
+   {CKANEXT_EGG_PATH}/ckanext/i18n/{LOCALE}/LC_MESSAGES/*.po \
+    this .po files can be generated through babel module \
+    the {LOCALE} should be the localization string e.g. fr'
+
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument('--translation_path', dest='translation_path', help='Dir where *.po is placed', required=True)
+
+    args = parser.parse_args()
+
     ckan_i18n_paths = []
     to_merge_localizations = {}
 
@@ -120,6 +135,12 @@ if __name__ == '__main__':
             ckan_i18n_paths.append(ckan_i18n_path.format(CKAN_PATH=path))
             print 'CKAN found: {0} : {1}'.format(name, version)
 
+    translations = os.listdir(args.translation_path)
+    for translation in translations:
+        absolute_path = os.path.join(args.translation_path, translation)
+        find_po_files(translation, to_merge_localizations)
+        print 'Customized translation found {0}'.format(absolute_path)
+
     if len(to_merge_localizations) == 0:
         print "No extension found starting '{0}'".format(extension_string)
     elif len(ckan_i18n_paths) == 0:
@@ -127,3 +148,7 @@ if __name__ == '__main__':
     else:
         for ckan_path in ckan_i18n_paths:
             install_localization(ckan_path, to_merge_localizations)
+
+
+if __name__ == "__main__":
+    main()

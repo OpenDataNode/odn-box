@@ -115,7 +115,7 @@ def main():
     the {LOCALE} should be the localization string e.g. fr'
 
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('--translation_path', dest='translation_path', help='Where file *.po is placed', required=True)
+    parser.add_argument('--translation_file', dest='translation_file', help='Where file *.po is placed', required=True, type=file)
 
     args = parser.parse_args()
     if not os.path.isfile(args.translation_path):
@@ -123,7 +123,7 @@ def main():
         return -1
 
     ckan_i18n_paths = []
-    to_merge_localizations = {'sk': [str(args.translation_path)]}
+    to_merge_localizations = {'sk': [str(args.translation_file.name)]}
 
     for distr in pip.get_installed_distributions():
         path = distr.location

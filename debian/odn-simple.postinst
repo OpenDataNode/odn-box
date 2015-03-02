@@ -78,14 +78,16 @@ apache_restart() {
     fi
 }
 
-service_virtuoso_restart() {
-if [ -x "/etc/init.d/apache2" ]; then
+set_virtuoso() {
+    sed --in-place "s/\(DirsAllowed.*= \., .*\)/\1, \/var\/cache\/virtuoso\/upload/g"  /etc/virtuoso-opensource-7/virtuoso.ini 
+
+    if [ -x "/etc/init.d/virtuoso-opensource-7" ]; then
             if [ -x /usr/sbin/invoke-rc.d ]; then
                     invoke-rc.d virtuoso-opensource-7  restart || true
             else
                     /etc/init.d/virtuoso-opensource-7  restart || true
             fi
-    fi
+     fi
 }
 
 
@@ -130,7 +132,7 @@ case "$1" in
 	a2enmod rewrite	
     a2enmod php5
     apache_restart
-    service_virtuoso_restart
+    set_virtuoso
   ;;
 
   abort-upgrade|abort-remove|abort-deconfigure)

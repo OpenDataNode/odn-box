@@ -163,7 +163,6 @@ case "$1" in
 	a2enmod proxy_connect
     a2enmod wsgi
 	a2enmod rewrite	
-    a2enmod php5
     apache_restart
     set_virtuoso
   ;;

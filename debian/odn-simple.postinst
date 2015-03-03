@@ -53,6 +53,7 @@ pipeline_configure() {
 ckan_plugin_sync_confgure() {
   site=$1
   /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckanext-odn-ic2pc-sync odn_ic2pc_sync_cmd initdb -c /etc/odn-simple/${site}/production.ini   
+  
 }
 
 wsgi_configure() {
@@ -63,23 +64,23 @@ wsgi_configure() {
 }
 
 
-add_ckan_user_and_set_api_key() {
+add_odn-ckan-pc_user() {
     site=$1
     . /usr/share/python/odn-ckan-shared/bin/activate
-        user_info=`paster --plugin=ckan user add admin password=admin email=admin@opendata.gov -c /etc/odn-simple/${site}/production.ini`
+        user_info=`paster --plugin=ckan user add admin password=admin email=admin@opendata.gov -c /etc/odn-simple/odn-ckan-pc/production.ini`
         # parse in python
         list=`echo $user_info | grep \{.*\} -o`
         api_key=`python -c  "d=${list} ; print d['apikey']"`
-        sed  --in-place "s/odn.ic2pc.dst.ckan.api.key = .*/odn.ic2pc.dst.ckan.api.key =  $api_key/" /etc/odn-simple/${site}/production.ini 
-        paster --plugin=ckan sysadmin  add  admin -c   /etc/odn-simple/${site}/production.ini  || true
+        # set api key at internal catalog
+        sed  --in-place "s/odn.ic2pc.dst.ckan.api.key = .*/odn.ic2pc.dst.ckan.api.key =  $api_key/" /etc/odn-simple/odn-ckan-ic/production.ini 
+        paster --plugin=ckan sysadmin  add  admin -c   /etc/odn-simple/odn-ckan-pc/production.ini  || true
     deactivate
 }
 
 
-add_ckan_user() {
-   site=$1
-   /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckan user add admin password=admin email=admin@opendata.gov -c /etc/odn-simple/${site}/production.ini || true
-   /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckan sysadmin  add  admin -c   /etc/odn-simple/${site}/production.ini  || true
+add_odn-ckan-ic_user() {
+   /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckan user add admin password=admin email=admin@opendata.gov -c /etc/odn-simple/odn-ckan-ic/production.ini || true
+   /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckan sysadmin  add  admin -c   /etc/odn-simple/odn-ckan-ic/production.ini  || true
 }
 
 apache_restart() {
@@ -152,8 +153,8 @@ case "$1" in
     db_configure odn-ckan-pc odn
     wsgi_configure odn-ckan-pc
     ckan_plugin_sync_confgure odn-ckan-ic
-    add_ckan_user_and_set_api_key odn-ckan-ic
-    add_ckan_user odn-ckan-pc
+    add_odn-ckan-ic_user odn-ckan-ic
+    add_odn-ckan-pc_user odn-ckan-pc
     run_ckan_internationalization
     a2dissite default
     a2ensite odn-simple

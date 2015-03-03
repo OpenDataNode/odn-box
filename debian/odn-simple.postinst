@@ -64,7 +64,7 @@ wsgi_configure() {
 }
 
 
-add_odn-ckan-pc_user() {
+add_odn_ckan_pc_user() {
     site=$1
     . /usr/share/python/odn-ckan-shared/bin/activate
         user_info=`paster --plugin=ckan user add admin password=admin email=admin@opendata.gov -c /etc/odn-simple/odn-ckan-pc/production.ini`
@@ -78,7 +78,7 @@ add_odn-ckan-pc_user() {
 }
 
 
-add_odn-ckan-ic_user() {
+add_odn_ckan_ic_user() {
    /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckan user add admin password=admin email=admin@opendata.gov -c /etc/odn-simple/odn-ckan-ic/production.ini || true
    /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckan sysadmin  add  admin -c   /etc/odn-simple/odn-ckan-ic/production.ini  || true
 }
@@ -153,8 +153,8 @@ case "$1" in
     db_configure odn-ckan-pc odn
     wsgi_configure odn-ckan-pc
     ckan_plugin_sync_confgure odn-ckan-ic
-    add_odn-ckan-ic_user odn-ckan-ic
-    add_odn-ckan-pc_user odn-ckan-pc
+    add_odn_ckan_ic_user
+    add_odn_ckan_pc_user
     run_ckan_internationalization
     a2dissite default
     a2ensite odn-simple

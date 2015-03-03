@@ -62,6 +62,20 @@ wsgi_configure() {
   a2ensite ${site}
 }
 
+
+add_ckan_user_and_set_api_key() {
+    site=$1
+    . /usr/share/python/odn-ckan-shared/bin/activate
+        user_info=`paster --plugin=ckan user add admin password=admin email=admin@opendata.gov -c /etc/odn-simple/${site}/production.ini`
+        # parse in python
+        list=`echo $user_info | grep \{.*\} -o`
+        api_key=`python -c  "d=${list} ; print d['apikey']"`
+        sed  --in-place "s/odn.ic2pc.dst.ckan.api.key = .*/odn.ic2pc.dst.ckan.api.key =  $api_key/" /etc/odn-simple/${site}/production.ini 
+        paster --plugin=ckan sysadmin  add  admin -c   /etc/odn-simple/${site}/production.ini  || true
+    deactivate
+}
+
+
 add_ckan_user() {
    site=$1
    /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckan user add admin password=admin email=admin@opendata.gov -c /etc/odn-simple/${site}/production.ini || true
@@ -138,7 +152,7 @@ case "$1" in
     db_configure odn-ckan-pc odn
     wsgi_configure odn-ckan-pc
     ckan_plugin_sync_confgure odn-ckan-ic
-    add_ckan_user odn-ckan-ic
+    add_ckan_user_and_set_api_key odn-ckan-ic
     add_ckan_user odn-ckan-pc
     run_ckan_internationalization
     a2dissite default

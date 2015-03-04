@@ -6,6 +6,25 @@ set -e
 db_creadentials(){
     db_get ckan/hostname
     HOSTNAME=$RET
+    echo -n "INFO: Set hostname for ckan: "
+    
+    if [ -z ${HOSTNAME} ]
+    then
+       HOSTNAME=`hostname --all-fqdns`
+    fi
+
+    if [ -z ${HOSTNAME}  ]
+    then
+       HOSTNAME=`hostname`
+    fi
+
+    if [ -z ${HOSTNAME}  ]
+    then
+       HOSTNAME="localhost"
+    fi
+    
+    echo " ${HOSTNAME}"
+    db_stop
 }
 
 

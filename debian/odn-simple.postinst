@@ -188,7 +188,7 @@ set_virtuoso() {
 
 
 set_ckans_hostname() {
-   echo ">> set_ckans_hostname: "$1
+   echo ">> set_ckans_hostname: "$HOSTNAME
    site=$1
     sed --in-place \
         -e "s/\$HOSTNAME/$HOSTNAME/" \

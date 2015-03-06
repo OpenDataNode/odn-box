@@ -149,7 +149,6 @@ add_odn_ckan_ic_user() {
             echo "user exists: "$user_name
         else
             user_info=`paster --plugin=ckan user add ${user_name} password=admin email=admin@opendata.gov -c /etc/odn-simple/odn-ckan-ic/production.ini`
-            paster --plugin=ckan user add ${user_name} password=admin email=admin@opendata.gov -c /etc/odn-simple/odn-ckan-ic/production.ini 
             echo "user added: "$user_name
             paster --plugin=ckan sysadmin  add  ${user_name} -c   /etc/odn-simple/odn-ckan-ic/production.ini  
             echo "set as sysadmin: "$user_name

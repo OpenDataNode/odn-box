@@ -8,7 +8,6 @@ db_creadentials(){
 
     db_get ckan/hostname
     HOSTNAME=$RET
-    echo -n "INFO: Set hostname for ckan: "
     
     if [ -z ${HOSTNAME} ]
     then

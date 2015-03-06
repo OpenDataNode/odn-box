@@ -4,6 +4,8 @@ set -e
 . /usr/share/debconf/confmodule
 
 db_creadentials(){
+    echo ">> db_creadentials"
+
     db_get ckan/hostname
     HOSTNAME=$RET
     echo -n "INFO: Set hostname for ckan: "
@@ -25,14 +27,20 @@ db_creadentials(){
     
     echo " ${HOSTNAME}"
     db_stop
+    
+   echo "<<"
 }
 
 
 default_java() {
-  /usr/sbin/update-java-alternatives --jre-headless --set java-1.7.0-openjdk-amd64
+    echo ">> default_java"
+   /usr/sbin/update-java-alternatives --jre-headless --set java-1.7.0-openjdk-amd64
+    echo "<<"
 }
 
 db_up() {
+  echo ">> db_up"
+
   #Check if postgresql is started
   /etc/init.d/postgresql status > /dev/null || /etc/init.d/postgresql start >/dev/null 2>&1
 
@@ -51,9 +59,13 @@ db_up() {
     fi
   done
   echo " Done"
+  echo "<<"
+ 
 }
 
 db_configure() {
+  echo ">> db_configure: "$1" "$2
+
   dbname="$1"
   usrname="$2"
   CHK_PG_DB=$(su - postgres -c "psql -t -c \"select count(1) from pg_catalog.pg_database where datname = '${dbname}'\"")
@@ -70,24 +82,32 @@ db_configure() {
     su - postgres -c "createdb -O ${usrname} ${dbname}" # >/dev/null 2>&1
     echo " Done" 
   fi
+
+  echo "<<"
 }
 
 pipeline_configure() {
+  echo ">> pipeline_configure"
   site=$1
   /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckanext-odn-pipeline pipeline-cmd initdb -c /etc/odn-simple/${site}/production.ini
+  echo "<<"
 }
 
 ckan_plugin_sync_confgure() {
+  echo ">> ckan_plugin_sync_confgure"
   site=$1
   /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckanext-odn-ic2pc-sync odn_ic2pc_sync_cmd initdb -c /etc/odn-simple/${site}/production.ini   
-  
+  echo "<<"
 }
 
 wsgi_configure() {
+  echo ">> wsgi_configure"
   site=$1
    echo -n "INFO: Ckan db init "${site}
   /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckan db init -c /etc/odn-simple/${site}/production.ini
   a2ensite ${site}
+   echo "<<"
+
 }
 
 
@@ -138,6 +158,8 @@ add_odn_ckan_ic_user() {
 }
 
 apache_restart() {
+   echo ">> apache_restart"
+
     if [ -x "/etc/init.d/apache2" ]; then
             if [ -x /usr/sbin/invoke-rc.d ]; then
                     invoke-rc.d apache2 restart || true
@@ -145,10 +167,12 @@ apache_restart() {
                     /etc/init.d/apache2 restart || true
             fi
     fi
+    echo "<< "
 }
 
 set_virtuoso() {
-    sed --in-place "s/\(DirsAllowed.*= \., .*\)/\1, \/var\/cache\/virtuoso\/upload/g"  /etc/virtuoso-opensource-7/virtuoso.ini 
+   echo ">> set_virtuoso"
+   sed --in-place "s/\(DirsAllowed.*= \., .*\)/\1, \/var\/cache\/virtuoso\/upload/g"  /etc/virtuoso-opensource-7/virtuoso.ini 
 
     if [ -x "/etc/init.d/virtuoso-opensource-7" ]; then
             if [ -x /usr/sbin/invoke-rc.d ]; then
@@ -158,25 +182,31 @@ set_virtuoso() {
             fi
      fi
      
-     add_user_system
+    add_user_system
+    echo "<< "
 }
 
 
 set_ckans_hostname() {
+   echo ">> set_ckans_hostname: "$1
    site=$1
     sed --in-place \
         -e "s/\$HOSTNAME/$HOSTNAME/" \
          /etc/odn-simple/${site}/production.ini
+    echo "<< "
 }
 
 run_ckan_internationalization() {
+   echo ">> run_ckan_internationalization"
     . /usr/share/python/odn-ckan-shared/bin/activate
     python /etc/odn-simple/odn-ckan-commons/odn_i18n.py --translation_file /etc/odn-simple/odn-ckan-commons/translations/sk/ckan.po
     deactivate
+    echo "<< "
 }
 
 
 add_user_system() {
+  echo ">> add_user_system"
   groupadd uploaders || true    
    
   if ! id uploader > /dev/null 2>&1 ; then
@@ -184,12 +214,15 @@ add_user_system() {
        
   fi
   fix_perm
+  echo "<< "
 }
 
 
 fix_perm() {
-    chown -R uploader /var/cache/virtuoso/upload
-    chown -R uploader /var/www/dump
+  echo ">> fix_perm"
+  chown -R uploader /var/cache/virtuoso/upload
+  chown -R uploader /var/www/dump
+  echo "<< "
 }
 
 case "$1" in

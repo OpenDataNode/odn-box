@@ -126,11 +126,12 @@ add_odn_ckan_pc_user() {
             # parse in python
             list=`echo $user_info | grep \{.*\} -o` 
             api_key=`python -c  "d=${list} ; print d['apikey']"`
+            paster --plugin=ckan sysadmin  add  ${user_name} -c   /etc/odn-simple/odn-ckan-pc/production.ini  
+            echo "set as sysadmin: "$user_name            
             # set api key at internal catalog
             sed  --in-place "s/odn.ic2pc.dst.ckan.api.key = .*/odn.ic2pc.dst.ckan.api.key =  $api_key/" /etc/odn-simple/odn-ckan-ic/production.ini 
             echo "set as api-key "
-            paster --plugin=ckan sysadmin  add  ${user_name} -c   /etc/odn-simple/odn-ckan-pc/production.ini  
-            echo "set as sysadmin: "$user_name
+            
         fi
        
     deactivate
@@ -143,11 +144,11 @@ add_odn_ckan_ic_user() {
    user_name="admin"
    
    . /usr/share/python/odn-ckan-shared/bin/activate
-        user_exists=`paster --plugin=ckan user search ${user_name} -c /etc/odn-simple/odn-ckan-pc/production.ini`
+        user_exists=`paster --plugin=ckan user search ${user_name} -c /etc/odn-simple/odn-ckan-ic/production.ini`
         if echo  $user_exists | grep --quiet name=${user_name}; then
             echo "user exists: "$user_name
         else
-            user_info=`paster --plugin=ckan user add ${user_name} password=admin email=admin@opendata.gov -c /etc/odn-simple/odn-ckan-pc/production.ini`
+            user_info=`paster --plugin=ckan user add ${user_name} password=admin email=admin@opendata.gov -c /etc/odn-simple/odn-ckan-ic/production.ini`
             paster --plugin=ckan user add ${user_name} password=admin email=admin@opendata.gov -c /etc/odn-simple/odn-ckan-ic/production.ini 
             echo "user added: "$user_name
             paster --plugin=ckan sysadmin  add  ${user_name} -c   /etc/odn-simple/odn-ckan-ic/production.ini  

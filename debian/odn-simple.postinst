@@ -162,7 +162,7 @@ set_ckans_hostname() {
    
     HOSTNAME=`hostname --all-fqdns`
     if [ -z ${HOSTNAME}  ]
-        then
+    then
         HOSTNAME=`hostname`
     fi
 
@@ -171,7 +171,7 @@ set_ckans_hostname() {
         HOSTNAME="localhost"
     fi
 
-    HOSTNAME="$(echo -e "${HOSTNAME}" | tr -d '[[:space:]]')"    
+    HOSTNAME="$(echo "${HOSTNAME}" | tr -d '[[:space:]]')"    
     echo " ${HOSTNAME}"
    
     sed --in-place \

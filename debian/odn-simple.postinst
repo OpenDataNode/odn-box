@@ -1,19 +1,15 @@
 #!/bin/sh
 set -e
 
-. /usr/share/debconf/confmodule
-
-db_creadentials(){
-    db_get ckan/hostname
-    HOSTNAME=$RET
-}
-
-
 default_java() {
-  /usr/sbin/update-java-alternatives --jre-headless --set java-1.7.0-openjdk-amd64
+    echo ">> default_java"
+   /usr/sbin/update-java-alternatives --jre-headless --set java-1.7.0-openjdk-amd64
+    echo "<<"
 }
 
 db_up() {
+  echo ">> db_up"
+
   #Check if postgresql is started
   /etc/init.d/postgresql status > /dev/null || /etc/init.d/postgresql start >/dev/null 2>&1
 
@@ -32,9 +28,13 @@ db_up() {
     fi
   done
   echo " Done"
+  echo "<<"
+ 
 }
 
 db_configure() {
+  echo ">> db_configure: "$1" "$2
+
   dbname="$1"
   usrname="$2"
   CHK_PG_DB=$(su - postgres -c "psql -t -c \"select count(1) from pg_catalog.pg_database where datname = '${dbname}'\"")
@@ -51,32 +51,84 @@ db_configure() {
     su - postgres -c "createdb -O ${usrname} ${dbname}" # >/dev/null 2>&1
     echo " Done" 
   fi
+
+  echo "<<"
 }
 
 pipeline_configure() {
+  echo ">> pipeline_configure"
   site=$1
   /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckanext-odn-pipeline pipeline-cmd initdb -c /etc/odn-simple/${site}/production.ini
+  echo "<<"
 }
 
 ckan_plugin_sync_confgure() {
+  echo ">> ckan_plugin_sync_confgure"
   site=$1
   /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckanext-odn-ic2pc-sync odn_ic2pc_sync_cmd initdb -c /etc/odn-simple/${site}/production.ini   
+  echo "<<"
 }
 
 wsgi_configure() {
+  echo ">> wsgi_configure"
   site=$1
    echo -n "INFO: Ckan db init "${site}
   /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckan db init -c /etc/odn-simple/${site}/production.ini
   a2ensite ${site}
+   echo "<<"
+
 }
 
-add_user() {
-   site=$1
-   /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckan user add admin password=admin email=admin@opendata.gov -c /etc/odn-simple/${site}/production.ini || true
-   /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckan sysadmin  add  admin -c   /etc/odn-simple/${site}/production.ini  || true
+
+add_odn_ckan_pc_user() {
+   echo ">> add_odn_ckan_pc_user"
+
+    user_name="admin"
+    . /usr/share/python/odn-ckan-shared/bin/activate
+
+        user_exists=`paster --plugin=ckan user search ${user_name} -c /etc/odn-simple/odn-ckan-pc/production.ini`
+        if echo  $user_exists | grep --quiet name=${user_name}; then
+            echo "user exists: "$user_name
+        else
+            user_info=`paster --plugin=ckan user add ${user_name} password=admin email=admin@opendata.gov -c /etc/odn-simple/odn-ckan-pc/production.ini`
+            echo "user added: "$user_name
+            # parse in python
+            list=`echo $user_info | grep \{.*\} -o` 
+            api_key=`python -c  "d=${list} ; print d['apikey']"`
+            paster --plugin=ckan sysadmin  add  ${user_name} -c   /etc/odn-simple/odn-ckan-pc/production.ini  
+            echo "set as sysadmin: "$user_name            
+            # set api key at internal catalog
+            sed  --in-place "s/odn.ic2pc.dst.ckan.api.key = .*/odn.ic2pc.dst.ckan.api.key =  $api_key/" /etc/odn-simple/odn-ckan-ic/production.ini 
+            echo "set as api-key "
+            
+        fi
+       
+    deactivate
+    echo "<< "
+}
+
+
+add_odn_ckan_ic_user() {
+   echo ">> add_odn_ckan_ic_user"
+   user_name="admin"
+   
+   . /usr/share/python/odn-ckan-shared/bin/activate
+        user_exists=`paster --plugin=ckan user search ${user_name} -c /etc/odn-simple/odn-ckan-ic/production.ini`
+        if echo  $user_exists | grep --quiet name=${user_name}; then
+            echo "user exists: "$user_name
+        else
+            user_info=`paster --plugin=ckan user add ${user_name} password=admin email=admin@opendata.gov -c /etc/odn-simple/odn-ckan-ic/production.ini`
+            echo "user added: "$user_name
+            paster --plugin=ckan sysadmin  add  ${user_name} -c   /etc/odn-simple/odn-ckan-ic/production.ini  
+            echo "set as sysadmin: "$user_name
+        fi
+    deactivate
+    echo "<< "
 }
 
 apache_restart() {
+   echo ">> apache_restart"
+
     if [ -x "/etc/init.d/apache2" ]; then
             if [ -x /usr/sbin/invoke-rc.d ]; then
                     invoke-rc.d apache2 restart || true
@@ -84,25 +136,81 @@ apache_restart() {
                     /etc/init.d/apache2 restart || true
             fi
     fi
+    echo "<< "
 }
 
+set_virtuoso() {
+   echo ">> set_virtuoso"
+   sed --in-place "s/\(DirsAllowed.*= \., .*\)/\1, \/var\/cache\/virtuoso\/upload/g"  /etc/virtuoso-opensource-7/virtuoso.ini 
+
+    if [ -x "/etc/init.d/virtuoso-opensource-7" ]; then
+            if [ -x /usr/sbin/invoke-rc.d ]; then
+                    invoke-rc.d virtuoso-opensource-7  restart || true
+            else
+                    /etc/init.d/virtuoso-opensource-7  restart || true
+            fi
+     fi
+     
+    add_user_system
+    echo "<< "
+}
+
+
 set_ckans_hostname() {
+   echo ">> set_ckans_hostname: "$HOSTNAME
    site=$1
+   
+    HOSTNAME=`hostname --all-fqdns`
+    if [ -z ${HOSTNAME}  ]
+    then
+        HOSTNAME=`hostname`
+    fi
+
+    if [ -z ${HOSTNAME}  ] 
+    then
+        HOSTNAME="localhost"
+    fi
+
+    HOSTNAME="$(echo "${HOSTNAME}" | tr -d '[[:space:]]')"    
+    echo " ${HOSTNAME}"
+   
     sed --in-place \
         -e "s/\$HOSTNAME/$HOSTNAME/" \
          /etc/odn-simple/${site}/production.ini
+    echo "<< "
 }
 
 run_ckan_internationalization() {
+   echo ">> run_ckan_internationalization"
     . /usr/share/python/odn-ckan-shared/bin/activate
-    python /etc/odn-simple/odn-ckan-commons/odn_i18n.py
+    python /etc/odn-simple/odn-ckan-commons/odn_i18n.py --translation_file /etc/odn-simple/odn-ckan-commons/translations/sk/ckan.po
     deactivate
+    echo "<< "
 }
 
 
+add_user_system() {
+  echo ">> add_user_system"
+  groupadd uploaders || true    
+   
+  if ! id uploader > /dev/null 2>&1 ; then
+       useradd -g uploaders uploader -p $(perl -e'print crypt("uploader", "salt")') 
+       
+  fi
+  fix_perm
+  echo "<< "
+}
+
+
+fix_perm() {
+  echo ">> fix_perm"
+  chown -R uploader /var/cache/virtuoso/upload
+  chown -R uploader /var/www/dump
+  echo "<< "
+}
+
 case "$1" in
   configure)
-    db_creadentials
     set_ckans_hostname odn-ckan-ic
     service odn-solr restart
     echo "wait for restart"
@@ -116,8 +224,8 @@ case "$1" in
     db_configure odn-ckan-pc odn
     wsgi_configure odn-ckan-pc
     ckan_plugin_sync_confgure odn-ckan-ic
-    add_user odn-ckan-ic
-    add_user odn-ckan-pc
+    add_odn_ckan_ic_user
+    add_odn_ckan_pc_user
     run_ckan_internationalization
     a2dissite default
     a2ensite odn-simple
@@ -127,7 +235,7 @@ case "$1" in
     a2enmod wsgi
 	a2enmod rewrite	
     apache_restart
-    db_stop
+    set_virtuoso
   ;;
 
   abort-upgrade|abort-remove|abort-deconfigure)

@@ -1,3 +1,0 @@
-Template: ckan/hostname
-Type: string
-Description: The hostname for your CKAN site and place where your dumps are stored. e.g. www.ckan.sk

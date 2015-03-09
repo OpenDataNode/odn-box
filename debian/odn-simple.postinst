@@ -1,36 +1,6 @@
 #!/bin/sh
 set -e
 
-. /usr/share/debconf/confmodule
-
-db_creadentials(){
-    echo ">> db_creadentials"
-
-    db_get ckan/hostname
-    HOSTNAME=$RET
-    
-    if [ -z ${HOSTNAME} ]
-    then
-       HOSTNAME=`hostname --all-fqdns`
-    fi
-
-    if [ -z ${HOSTNAME}  ]
-    then
-       HOSTNAME=`hostname`
-    fi
-
-    if [ -z ${HOSTNAME}  ]
-    then
-       HOSTNAME="localhost"
-    fi
-    
-    echo " ${HOSTNAME}"
-    db_stop
-    
-   echo "<<"
-}
-
-
 default_java() {
     echo ">> default_java"
    /usr/sbin/update-java-alternatives --jre-headless --set java-1.7.0-openjdk-amd64
@@ -189,6 +159,21 @@ set_virtuoso() {
 set_ckans_hostname() {
    echo ">> set_ckans_hostname: "$HOSTNAME
    site=$1
+   
+    HOSTNAME=`hostname --all-fqdns`
+    if [ -z ${HOSTNAME}  ]
+        then
+        HOSTNAME=`hostname`
+    fi
+
+    if [ -z ${HOSTNAME}  ] 
+    then
+        HOSTNAME="localhost"
+    fi
+
+    HOSTNAME="$(echo -e "${HOSTNAME}" | tr -d '[[:space:]]')"    
+    echo " ${HOSTNAME}"
+   
     sed --in-place \
         -e "s/\$HOSTNAME/$HOSTNAME/" \
          /etc/odn-simple/${site}/production.ini
@@ -226,7 +211,6 @@ fix_perm() {
 
 case "$1" in
   configure)
-    db_creadentials
     set_ckans_hostname odn-ckan-ic
     service odn-solr restart
     echo "wait for restart"

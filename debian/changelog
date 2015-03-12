@@ -1,3 +1,9 @@
+odn-simple (0.11.1) unstable; urgency=low
+
+  * Create snapshot version
+
+ -- jmc <jmc@wheezy.marcek.local>  Thu, 12 Mar 2015 09:00:00 +0100
+
 odn-simple (0.11.0) stable; urgency=low
 
   * Create release version

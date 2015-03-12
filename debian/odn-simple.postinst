@@ -1,12 +1,6 @@
 #!/bin/sh
 set -e
 
-default_java() {
-    echo ">> default_java"
-   /usr/sbin/update-java-alternatives --jre-headless --set java-1.7.0-openjdk-amd64
-    echo "<<"
-}
-
 db_up() {
   echo ">> db_up"
 
@@ -216,7 +210,6 @@ case "$1" in
     echo "wait for restart"
     # TODO think about clever waiting
     sleep 10
-    default_java
     db_up
     db_configure odn-ckan-ic odn
     wsgi_configure odn-ckan-ic

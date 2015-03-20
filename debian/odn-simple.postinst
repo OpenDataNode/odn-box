@@ -149,11 +149,7 @@ set_virtuoso() {
     echo "<< "
 }
 
-
-set_ckans_hostname() {
-   echo ">> set_ckans_hostname: "$HOSTNAME
-   site=$1
-   
+get_hostname() {
     HOSTNAME=`hostname --all-fqdns`
     if [ -z ${HOSTNAME}  ]
     then
@@ -166,7 +162,15 @@ set_ckans_hostname() {
     fi
 
     HOSTNAME="$(echo "${HOSTNAME}" | tr -d '[[:space:]]')"    
-    echo " ${HOSTNAME}"
+    # return hostname
+    echo "$HOSTNAME"
+}
+
+
+set_ckans_hostname() {
+   echo ">> set_ckans_hostname: "$2
+   site=$1
+   HOSTNAME=$2
    
     sed --in-place \
         -e "s/\$HOSTNAME/$HOSTNAME/" \
@@ -203,9 +207,44 @@ fix_perm() {
   echo "<< "
 }
 
+set_midpoint() {
+  echo ">> set_midpoint hostname: $1"
+  HOSTNAME=$1
+  
+  if [ -e /usr/share/odn-midpoint/webapps/midpoint/WEB-INF/web.xml ]; then
+    mv /usr/share/odn-midpoint/webapps/midpoint/WEB-INF/web.xml /usr/share/odn-midpoint/webapps/midpoint/WEB-INF/web.xml.bck 
+  fi
+  
+  if [ -e /usr/share/odn-midpoint/webapps/midpoint/WEB-INF/ctx-web-security.xml  ]; then
+      mv /usr/share/odn-midpoint/webapps/midpoint/WEB-INF/ctx-web-security.xml /usr/share/odn-midpoint/webapps/midpoint/WEB-INF/ctx-web-security.xml.bck 
+  fi
+
+  # set domain name  
+  sed --in-place \
+        -e "s/\$HOSTNAME/$HOSTNAME/" \
+         /etc/odn-simple/odn-midpoint/ctx-web-security.xml 
+
+  # this block of code is here because spring has problem with symbolic link - it's unable to find another xmls {
+  mv /etc/odn-simple/odn-midpoint/ctx-web-security.xml  /usr/share/odn-midpoint/webapps/midpoint/WEB-INF/ctx-web-security.xml
+  mv /etc/odn-simple/odn-midpoint/web.xml  /usr/share/odn-midpoint/webapps/midpoint/WEB-INF/web.xml   
+ 
+  ln -s  /usr/share/odn-midpoint/webapps/midpoint/WEB-INF/ctx-web-security.xml /etc/odn-simple/odn-midpoint/ctx-web-security.xml  
+  ln -s  /usr/share/odn-midpoint/webapps/midpoint/WEB-INF/web.xml /etc/odn-simple/odn-midpoint/web.xml 
+  # }
+  chown -R odn-midpoint  /etc/odn-simple/odn-midpoint
+  chown -R odn-midpoint /usr/share/odn-midpoint/webapps/midpoint/WEB-INF/web.xml 
+  chown -R odn-midpoint /usr/share/odn-midpoint/webapps/midpoint/WEB-INF/ctx-web-security.xml
+  
+  
+  service odn-midpoint restart
+  echo "<< set_midpoint"
+}
+
+
 case "$1" in
   configure)
-    set_ckans_hostname odn-ckan-ic
+    hostname=$(get_hostname)
+    set_ckans_hostname odn-ckan-ic $hostname
     service odn-solr restart
     echo "wait for restart"
     # TODO think about clever waiting
@@ -229,6 +268,7 @@ case "$1" in
 	a2enmod rewrite	
     apache_restart
     set_virtuoso
+    set_midpoint $hostname
   ;;
 
   abort-upgrade|abort-remove|abort-deconfigure)

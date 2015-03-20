@@ -21,19 +21,22 @@ set -e
 case "$1" in
 
     remove|abort-install|disappear)
- 
-    
+     
     ;;
  
     purge)
-    # odn-midpoint config
-    if [ -h /etc/odn-simple/odn-midpoint/ctx-web-security.xml ] ; then 
-	    unlink /etc/odn-simple/odn-midpoint/ctx-web-security.xml
+    # link odn-midpoint to default config ctx-web-security.xml  
+    if [ -h /usr/share/odn-midpoint/midpoint/WEB-INF/ctx-web-security.xml  ] ; then 
+	    unlink /usr/share/odn-midpoint/midpoint/WEB-INF/ctx-web-security.xml  
+        ln -s /usr/share/odn-midpoint/midpoint/WEB-INF/ctx-web-security_default.xml /usr/share/odn-midpoint/midpoint/WEB-INF/ctx-web-security.xml  
 	fi
-     if [ -h /etc/odn-simple/odn-midpoint/web.xml ] ; then 
-	    unlink /etc/odn-simple/odn-midpoint/web.xml
+    # link odn-midpoint to default config web.xml 
+    if [ -h /usr/share/odn-midpoint/midpoint/WEB-INF/web.xml  ] ; then 
+	    unlink  /usr/share/odn-midpoint/midpoint/WEB-INF/web.xml  
+        ln -s /usr/share/odn-midpoint/midpoint/WEB-INF/web_default.xml /usr/share/odn-midpoint/midpoint/WEB-INF/web.xml  
 	fi
-  
+    # reload configuration
+    service odn-midpoint restart
     ;;
     
     

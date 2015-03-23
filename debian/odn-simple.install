@@ -5,3 +5,4 @@ solr/* etc/odn-solr/solr/
 publication/sparql/* var/www/sparql/
 publication/dump/* var/www/dump/
 apache/*  etc/odn-simple/
+midpoint/conf/* etc/odn-simple/odn-midpoint/

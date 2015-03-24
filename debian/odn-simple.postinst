@@ -231,7 +231,7 @@ set_midpoint() {
   chown -R odn-midpoint /usr/share/odn-midpoint/midpoint/WEB-INF/web.xml 
   chown -R odn-midpoint /usr/share/odn-midpoint/midpoint/WEB-INF/ctx-web-security.xml
     
-  service odn-midpoint restart
+  invoke-rc.d odn-midpoint restart
   echo "<< set_midpoint"
 }
 
@@ -240,7 +240,7 @@ case "$1" in
   configure)
     hostname=$(get_hostname)
     set_ckans_hostname odn-ckan-ic $hostname
-    service odn-solr restart
+    invoke-rc.d odn-solr restart
     echo "wait for restart"
     # TODO think about clever waiting
     sleep 10

@@ -230,6 +230,7 @@ set_midpoint() {
   chown -R odn-midpoint  /etc/odn-simple/odn-midpoint
   chown -R odn-midpoint /usr/share/odn-midpoint/midpoint/WEB-INF/web.xml 
   chown -R odn-midpoint /usr/share/odn-midpoint/midpoint/WEB-INF/ctx-web-security.xml
+  chown -R odn-midpoint /var/lib/midpoint.home/
     
   invoke-rc.d odn-midpoint restart
   echo "<< set_midpoint"

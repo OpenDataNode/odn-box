@@ -1,0 +1,6 @@
+version: 1
+
+dn: ou=people,dc=opendata,dc=org
+objectClass: organizationalUnit
+objectClass: top
+ou: people

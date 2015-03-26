@@ -1,0 +1,21 @@
+dn: dc=opendata,dc=org
+objectClass: top
+objectClass: domain
+dc: opendata
+description: Opendata
+
+
+dn: ou=Administrators,dc=opendata,dc=org
+objectclass: top
+objectclass: organizationalunit
+ou: Administrators
+
+
+dn: cn=idm,ou=Administrators,dc=opendata,dc=org
+objectclass: top
+objectclass: person
+cn: idm
+sn: IDM Administrator
+description: Special LDAP acccount used by the IDM
+  to access the LDAP data.
+userPassword: {SSHA}R5KF3K4X2FX5gkWKuDxm4M6gZyO0QgNF

@@ -26,6 +26,7 @@ case "$1" in
 	    unlink /usr/share/odn-midpoint/midpoint/WEB-INF/ctx-web-security.xml  
         ln -s /usr/share/odn-midpoint/midpoint/WEB-INF/ctx-web-security_default.xml /usr/share/odn-midpoint/midpoint/WEB-INF/ctx-web-security.xml  
 	fi
+    
     # link odn-midpoint to default config web.xml 
     if [ -h /usr/share/odn-midpoint/midpoint/WEB-INF/web.xml  ] ; then 
 	    unlink  /usr/share/odn-midpoint/midpoint/WEB-INF/web.xml  
@@ -36,6 +37,19 @@ case "$1" in
     if [ -x "/etc/init.d/odn-midpoint" ]; then
         invoke-rc.d odn-midpoint start || true
     fi
+    
+    
+    # link odn-solr to default slapd configuration
+    if [ -h  /etc/ldap/slapd.d/cn\=config/olcDatabase\=\{2\}hdb.ldif  ] ; then 
+	    unlink  /etc/ldap/slapd.d/cn\=config/olcDatabase\=\{2\}hdb.ldif 
+	fi
+    
+    # reload default odn-simple configuration
+    if [ -x "/etc/init.d/slapd" ]; then
+        invoke-rc.d slapd start || true
+    fi
+    
+    
     ;;
  
     purge)

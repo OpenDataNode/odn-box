@@ -120,6 +120,25 @@ add_odn_ckan_ic_user() {
     echo "<< "
 }
 
+
+add_datastore_readonly_user() {
+   echo ">> add_datastore_readonly_user "$1" "$2
+   usrname=$1
+   password=$2
+   
+   su - postgres -c "psql -q -c \"CREATE USER ${usrname} WITH PASSWORD ${password}\"" # >/dev/null 2>&1
+   echo "Done"
+}
+
+datastore_readonly_user_set_permission() {
+   echo ">> datastore_readonly_user_set_permission "$1
+   cfg_path=$1
+
+   . /usr/share/python/odn-ckan-shared/bin/activate
+   /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckan datastore set-permissions postgres -c ${cfg_path}
+   echo " Done"
+}
+
 apache_restart() {
    echo ">> apache_restart"
 
@@ -274,6 +293,14 @@ case "$1" in
     add_odn_ckan_ic_user
     add_odn_ckan_pc_user
     run_ckan_internationalization
+	# datastore for ic
+	db_configure datastore-odn-ic odn
+	add_datastore_readonly_user ds-odn-ic odn-ic
+	datastore_readonly_user_set_permission /etc/odn-simple/odn-ckan-ic/production.ini
+	# datastore for pc
+	db_configure datastore-odn-pc odn
+	add_datastore_readonly_user ds-odn-pc odn-pc
+	datastore_readonly_user_set_permission /etc/odn-simple/odn-ckan-pc/production.ini	
     a2dissite default
     a2ensite odn-simple
 	a2enmod proxy 

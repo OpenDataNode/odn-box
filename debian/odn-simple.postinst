@@ -186,24 +186,54 @@ run_ckan_internationalization() {
     echo "<< "
 }
 
+unifiedviews_restart() {
+  echo ">> unifiedviews_restart"
+  if [ -x "/etc/init.d/unifiedviews-backend" ]; then
+     if [ -x /usr/sbin/invoke-rc.d ]; then
+        invoke-rc.d unifiedviews-backend restart || true
+     else
+        /etc/init.d/unifiedviews-backend restart || true
+     fi
+  fi
+
+  if [ -x "/etc/init.d/unifiedviews-frontend" ]; then
+     if [ -x /usr/sbin/invoke-rc.d ]; then
+        invoke-rc.d unifiedviews-frontend restart || true
+       else
+         /etc/init.d/unifiedviews-frontend restart || true
+     fi
+  fi    
+  
+  echo "<< unifiedviews_restart"
+}
+
 
 add_user_system() {
   echo ">> add_user_system"
   groupadd uploaders || true    
-   
+  
+  #if user not exists
   if ! id uploader > /dev/null 2>&1 ; then
        useradd -g uploaders uploader -p $(perl -e'print crypt("uploader", "salt")') 
-       
   fi
+  
+  #if user exists for unifiedviews
+  if id unifiedviews > /dev/null 2>&1 ; then
+       usermod -a -G uploaders unifiedviews
+  fi 
   fix_perm
+  unifiedviews_restart
+   
   echo "<< "
 }
 
 
 fix_perm() {
   echo ">> fix_perm"
-  chown -R uploader /var/cache/virtuoso/upload
-  chown -R uploader /var/www/dump
+  chown uploader:uploaders /var/cache/virtuoso/upload
+  chown uploader:uploaders /var/www/dump
+  chmod g+sw /var/www/dump
+  chmod g+sw /var/cache/virtuoso/upload
   echo "<< "
 }
 

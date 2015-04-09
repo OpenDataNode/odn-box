@@ -285,21 +285,21 @@ case "$1" in
     sleep 10
     db_up
     db_configure odn-ckan-ic odn
+    db_configure odn-ckan-pc odn
+    db_configure datastore-odn-pc odn
+    db_configure datastore-odn-ic odn
+    add_datastore_readonly_user ds_odn_ic odn-ic
+	add_datastore_readonly_user ds_odn_pc odn-pc
     wsgi_configure odn-ckan-ic
     pipeline_configure odn-ckan-ic
-    db_configure odn-ckan-pc odn
     wsgi_configure odn-ckan-pc
     ckan_plugin_sync_confgure odn-ckan-ic
     add_odn_ckan_ic_user
     add_odn_ckan_pc_user
     run_ckan_internationalization
 	# datastore for ic
-	db_configure datastore-odn-ic odn
-	add_datastore_readonly_user ds-odn-ic odn-ic
 	datastore_readonly_user_set_permission /etc/odn-simple/odn-ckan-ic/production.ini
 	# datastore for pc
-	db_configure datastore-odn-pc odn
-	add_datastore_readonly_user ds-odn-pc odn-pc
 	datastore_readonly_user_set_permission /etc/odn-simple/odn-ckan-pc/production.ini	
     a2dissite default
     a2ensite odn-simple

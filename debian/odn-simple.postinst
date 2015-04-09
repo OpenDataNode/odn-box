@@ -120,6 +120,34 @@ add_odn_ckan_ic_user() {
     echo "<< "
 }
 
+
+add_datastore_readonly_user() {
+   echo ">> add_datastore_readonly_user "$1" "$2
+   usrname=$1
+   password=$2
+   
+   su - postgres -c "psql -q -c \"CREATE USER ${usrname} WITH PASSWORD '${password}'\"" || true
+   echo "Done"
+
+}
+
+datastore_readonly_user_set_permission() {
+   echo ">> datastore_readonly_user_set_permission "$1
+   cfg_path=$1
+
+   if ! id postgres > /dev/null 2>&1 ; then
+      echo "user postgres is missing. Probably installation of postgresql went wrong"
+      exit -1
+   fi
+   
+   . /usr/share/python/odn-ckan-shared/bin/activate
+      paster --plugin=ckan datastore set-permissions -c ${cfg_path} | su postgres -c psql  || true
+      
+   deactivate
+   
+   echo "<< "
+}
+
 apache_restart() {
    echo ">> apache_restart"
 
@@ -296,14 +324,22 @@ case "$1" in
     sleep 10
     db_up
     db_configure odn-ckan-ic odn
+    db_configure odn-ckan-pc odn
+    db_configure datastore-odn-pc odn
+    db_configure datastore-odn-ic odn
+    add_datastore_readonly_user ds_odn_ic odn-ic
+	add_datastore_readonly_user ds_odn_pc odn-pc
     wsgi_configure odn-ckan-ic
     pipeline_configure odn-ckan-ic
-    db_configure odn-ckan-pc odn
     wsgi_configure odn-ckan-pc
     ckan_plugin_sync_confgure odn-ckan-ic
     add_odn_ckan_ic_user
     add_odn_ckan_pc_user
     run_ckan_internationalization
+	# datastore for ic
+	datastore_readonly_user_set_permission /etc/odn-simple/odn-ckan-ic/production.ini
+	# datastore for pc
+	datastore_readonly_user_set_permission /etc/odn-simple/odn-ckan-pc/production.ini	
     a2dissite default
     a2ensite odn-simple
 	a2enmod proxy 

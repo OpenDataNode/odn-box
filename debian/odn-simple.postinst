@@ -126,8 +126,9 @@ add_datastore_readonly_user() {
    usrname=$1
    password=$2
    
-   su - postgres -c "psql -q -c \"CREATE USER ${usrname} WITH PASSWORD ${password}\"" # >/dev/null 2>&1
+   su - postgres -c "psql -q -c \"CREATE USER ${usrname} WITH PASSWORD '${password}'\"" || true
    echo "Done"
+
 }
 
 datastore_readonly_user_set_permission() {

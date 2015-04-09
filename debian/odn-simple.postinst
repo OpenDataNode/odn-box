@@ -135,9 +135,17 @@ datastore_readonly_user_set_permission() {
    echo ">> datastore_readonly_user_set_permission "$1
    cfg_path=$1
 
+   if ! id postgres > /dev/null 2>&1 ; then
+      echo "user postgres is missing. Probably installation of postgresql went wrong"
+      exit -1
+   fi
+   
    . /usr/share/python/odn-ckan-shared/bin/activate
-   /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckan datastore set-permissions postgres -c ${cfg_path}
-   echo " Done"
+      paster --plugin=ckan datastore set-permissions -c ${cfg_path} | su postgres -c psql  || true
+      
+   deactivate
+   
+   echo "<< "
 }
 
 apache_restart() {

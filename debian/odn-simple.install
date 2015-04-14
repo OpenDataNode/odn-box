@@ -6,5 +6,3 @@ publication/sparql/* var/www/sparql/
 publication/dump/* var/www/dump/
 apache/*  etc/odn-simple/
 midpoint/conf/* etc/odn-simple/odn-midpoint/
-slapd/data/* usr/share/odn-simple/ldap/
-slapd/conf/* etc/odn-simple/ldap/

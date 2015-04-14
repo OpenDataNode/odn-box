@@ -24,12 +24,6 @@ case "$1" in
         invoke-rc.d odn-midpoint stop || true
     fi    
     
-    # stop slapd because odn-simple configuration files will be removed
-    if [ -x "/etc/init.d/slapd" ]; then
-        invoke-rc.d slapd stop || true
-    fi    
-    
-    
     ;;
 
  failed-upgrade)

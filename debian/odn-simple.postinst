@@ -250,11 +250,27 @@ add_user_system() {
        usermod -a -G uploaders unifiedviews
   fi 
   fix_perm
-  unifiedviews_restart
-   
+  
   echo "<< "
 }
 
+set_unifiedviews() {
+    echo ">>set_unifiedviews"
+    HOSTNAME=$1
+    FRONTEND_PROPS=/etc/unifiedviews/frontend-config.properties
+    UVIEWS_PORT=28080
+    CAS_PORT=38443
+    
+    sed -i "s/#logout.url=.*/logout.url=http:\/\/$HOSTNAME:$UVIEWS_PORT\/unifiedviews\/cas_logout/" $FRONTEND_PROPS
+    sed -i "s/#cas.server.host=.*/cas.server.host=https:\/\/$HOSTNAME:$CAS_PORT\/cas/" $FRONTEND_PROPS
+    sed -i "s/#cas.security.check.url=.*/cas.security.check.url=http:\/\/$HOSTNAME:$UVIEWS_PORT\/unifiedviews\/login\/cas/" $FRONTEND_PROPS
+    sed -i "s/#cas.login.url=.*/cas.login.url=https:\/\/$HOSTNAME:$CAS_PORT\/cas\/login/" $FRONTEND_PROPS
+    sed -i "s/#cas.logout.url=.*/cas.logout.url=https:\/\/$HOSTNAME:$CAS_PORT\/cas\/logout?service=http%3A%2F%2F192.168.7.42%3A18080%2Funifiedviews%2F/" $FRONTEND_PROPS
+    
+    unifiedviews_restart
+    echo "<<set_unifiedviews"
+
+}
 
 fix_perm() {
   echo ">> fix_perm"
@@ -330,6 +346,7 @@ case "$1" in
     apache_restart
     set_virtuoso
     set_midpoint $hostname
+    set_unifiedviews $hostname
   ;;
 
   abort-upgrade|abort-remove|abort-deconfigure)

@@ -214,6 +214,18 @@ run_ckan_internationalization() {
     echo "<< "
 }
 
+set_odn_ckan_for_cas() {
+    echo ">> set_odn_ckan_for_cas site: $1,  hostname: $2"
+    site=$1
+    HOSTNAME=$2
+
+    sed --in-place \
+        -e "s/\$HOSTNAME/$HOSTNAME/" \
+         /etc/odn-simple/${site}/who.ini
+
+    echo "<< "
+}
+
 unifiedviews_restart() {
   echo ">> unifiedviews_restart"
   if [ -x "/etc/init.d/unifiedviews-backend" ]; then
@@ -336,6 +348,8 @@ case "$1" in
 	datastore_readonly_user_set_permission /etc/odn-simple/odn-ckan-ic/production.ini
 	# datastore for pc
 	datastore_readonly_user_set_permission /etc/odn-simple/odn-ckan-pc/production.ini	
+    set_odn_ckan_for_cas odn-ckan-ic $hostname
+    set_odn_ckan_for_cas odn-ckan-pc $hostname
     a2dissite default
     a2ensite odn-simple
 	a2enmod proxy 

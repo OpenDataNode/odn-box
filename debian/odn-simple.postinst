@@ -349,7 +349,6 @@ case "$1" in
 	# datastore for pc
 	datastore_readonly_user_set_permission /etc/odn-simple/odn-ckan-pc/production.ini	
     set_odn_ckan_for_cas odn-ckan-ic $hostname
-    set_odn_ckan_for_cas odn-ckan-pc $hostname
     a2dissite default
     a2ensite odn-simple
 	a2enmod proxy 

@@ -341,7 +341,6 @@ case "$1" in
     pipeline_configure odn-ckan-ic
     wsgi_configure odn-ckan-pc
     ckan_plugin_sync_confgure odn-ckan-ic
-    add_odn_ckan_ic_user
     add_odn_ckan_pc_user
     run_ckan_internationalization
 	# datastore for ic

@@ -226,6 +226,13 @@ set_odn_ckan_for_cas() {
     echo "<< "
 }
 
+configure_filestore() {
+    echo ">> configure_filestore"
+        chown www-data:www-data /var/lib/odn-ckan-ic/storage
+
+    echo "<< configure_filestore"
+}
+
 unifiedviews_restart() {
   echo ">> unifiedviews_restart"
   if [ -x "/etc/init.d/unifiedviews-backend" ]; then
@@ -337,6 +344,7 @@ case "$1" in
     db_configure datastore-odn-ic odn
     add_datastore_readonly_user ds_odn_ic odn-ic
 	add_datastore_readonly_user ds_odn_pc odn-pc
+    configure_filestore
     wsgi_configure odn-ckan-ic
     pipeline_configure odn-ckan-ic
     wsgi_configure odn-ckan-pc

@@ -1,0 +1,3 @@
+#!/bin/bash
+# for update the tracking data and rebuild the search index - because popularity index
+/usr/share/python/odn-ckan-shared/bin/paster  --plugin=ckan tracking update -c /etc/odn-simple/odn-ckan-pc/production.ini && /usr/share/python/odn-ckan-shared/bin/paster  --plugin=ckan search-index rebuild -r -c /etc/odn-simple/odn-ckan-pc/production.ini

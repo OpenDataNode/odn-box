@@ -233,6 +233,16 @@ configure_filestore() {
     echo "<< configure_filestore"
 }
 
+fix_perms_cron_job() {
+    # set cron jobs as executable 
+    # for update the tracking data and rebuild the search index - because popularity index
+    echo ">> fix_perms_cron_job"
+        chmod +x /etc/cron.daily/odn-ckan-ic
+        chmod +x /etc/cron.daily/odn-ckan-pc
+
+        echo "<< fix_perms_cron_job"
+}
+
 unifiedviews_restart() {
   echo ">> unifiedviews_restart"
   if [ -x "/etc/init.d/unifiedviews-backend" ]; then
@@ -365,6 +375,7 @@ case "$1" in
     #}
     # odn-ckan-ic and odn-ckan-pc {
     run_ckan_internationalization
+    fix_perms_cron_job
     # }
     a2dissite default
     a2ensite odn-simple

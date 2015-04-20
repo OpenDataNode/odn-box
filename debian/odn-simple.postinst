@@ -332,30 +332,34 @@ set_midpoint() {
 case "$1" in
   configure)
     hostname=$(get_hostname)
-    set_ckans_hostname odn-ckan-ic $hostname
     invoke-rc.d odn-solr restart
     echo "wait for restart"
     # TODO think about clever waiting
     sleep 10
     db_up
+    # odn-ckan-ic {
+    set_ckans_hostname odn-ckan-ic $hostname
     db_configure odn-ckan-ic odn
-    db_configure odn-ckan-pc odn
-    db_configure datastore-odn-pc odn
     db_configure datastore-odn-ic odn
     add_datastore_readonly_user ds_odn_ic odn-ic
-	add_datastore_readonly_user ds_odn_pc odn-pc
-    configure_filestore
     wsgi_configure odn-ckan-ic
     pipeline_configure odn-ckan-ic
-    wsgi_configure odn-ckan-pc
     ckan_plugin_sync_confgure odn-ckan-ic
-    add_odn_ckan_pc_user
-    run_ckan_internationalization
-	# datastore for ic
 	datastore_readonly_user_set_permission /etc/odn-simple/odn-ckan-ic/production.ini
-	# datastore for pc
-	datastore_readonly_user_set_permission /etc/odn-simple/odn-ckan-pc/production.ini	
     set_odn_ckan_for_cas odn-ckan-ic $hostname
+    configure_filestore
+    # }
+    # odn-ckan-pc {
+    db_configure odn-ckan-pc odn
+    db_configure datastore-odn-pc odn
+ 	add_datastore_readonly_user ds_odn_pc odn-pc
+    wsgi_configure odn-ckan-pc
+    add_odn_ckan_pc_user
+	datastore_readonly_user_set_permission /etc/odn-simple/odn-ckan-pc/production.ini	
+    #}
+    # odn-ckan-ic and odn-ckan-pc {
+    run_ckan_internationalization
+    # }
     a2dissite default
     a2ensite odn-simple
 	a2enmod proxy 

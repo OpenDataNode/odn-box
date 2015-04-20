@@ -291,6 +291,12 @@ set_unifiedviews() {
 
 }
 
+install_dpu_plugins() {
+  echo ">> installing dpu plugins"
+  sh /usr/share/unifiedviews/dist/plugins/deploy-dpus.sh
+  echo "<< dpu plugins installation done"
+}
+
 fix_perm() {
   echo ">> fix_perm"
   chown uploader:uploaders /var/cache/virtuoso/upload
@@ -371,6 +377,7 @@ case "$1" in
     set_virtuoso
     set_midpoint $hostname
     set_unifiedviews $hostname
+    install_dpu_plugins
   ;;
 
   abort-upgrade|abort-remove|abort-deconfigure)

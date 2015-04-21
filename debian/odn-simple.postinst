@@ -347,11 +347,13 @@ case "$1" in
     # }
     a2dissite default
     a2ensite odn-simple
+    a2ensite odn-cas-ssl
 	a2enmod proxy 
 	a2enmod proxy_http
 	a2enmod proxy_connect
     a2enmod wsgi
 	a2enmod rewrite	
+    a2enmod ssl proxy_ajp
     apache_restart
     set_virtuoso
     set_unifiedviews $hostname

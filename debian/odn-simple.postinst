@@ -297,7 +297,8 @@ set_unifiedviews() {
     sed -i "s/#cas.logout.url=.*/cas.logout.url=https:\/\/$HOSTNAME:$CAS_PORT\/cas\/logout?service=http%3A%2F%2F192.168.7.42%3A18080%2Funifiedviews%2F/" $FRONTEND_PROPS
     
     sh /usr/share/unifiedviews/dist/plugins/deploy-dpus.sh
-    
+    sh /usr/share/unifiedviews/dist/odn_plugins/deploy-dpus.sh   
+ 
     unifiedviews_restart
     echo "<<set_unifiedviews"
 

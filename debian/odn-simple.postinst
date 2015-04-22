@@ -311,6 +311,35 @@ fix_perm() {
   echo "<< "
 }
 
+set_midpoint() {
+  echo ">> set_midpoint hostname: $1"
+  HOSTNAME=$1
+  
+  if [ -h /usr/share/odn-midpoint/midpoint/WEB-INF/ctx-web-security.xml  ] ; then 
+    unlink /usr/share/odn-midpoint/midpoint/WEB-INF/ctx-web-security.xml
+  fi
+  
+  if [ -h /usr/share/odn-midpoint/midpoint/WEB-INF/web.xml  ] ; then 
+    unlink /usr/share/odn-midpoint/midpoint/WEB-INF/web.xml
+  fi
+  
+  # set domain name  
+  sed --in-place \
+        -e "s/\$HOSTNAME/$HOSTNAME/" \
+         /etc/odn-simple/odn-midpoint/ctx-web-security.xml 
+  
+  ln -s  /etc/odn-simple/odn-midpoint/ctx-web-security.xml  /usr/share/odn-midpoint/midpoint/WEB-INF/ctx-web-security.xml 
+  ln -s  /etc/odn-simple/odn-midpoint/web.xml  /usr/share/odn-midpoint/midpoint/WEB-INF/web.xml
+  
+  chown -R odn-midpoint /etc/odn-simple/odn-midpoint
+  chown -R odn-midpoint /usr/share/odn-midpoint/midpoint/WEB-INF/web.xml 
+  chown -R odn-midpoint /usr/share/odn-midpoint/midpoint/WEB-INF/ctx-web-security.xml
+  chown -R odn-midpoint /var/lib/midpoint.home/
+    
+  invoke-rc.d odn-midpoint restart
+  echo "<< set_midpoint"
+}
+
 case "$1" in
   configure)
     hostname=$(get_hostname)
@@ -354,6 +383,7 @@ case "$1" in
     a2enmod ssl proxy_ajp
     apache_restart
     set_virtuoso
+    set_midpoint $hostname
     set_unifiedviews $hostname
   ;;
 

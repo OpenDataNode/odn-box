@@ -383,8 +383,8 @@ case "$1" in
     a2enmod ssl proxy_ajp
     apache_restart
     set_virtuoso
-    set_midpoint $hostname
     set_unifiedviews $hostname
+    set_midpoint $hostname
   ;;
 
   abort-upgrade|abort-remove|abort-deconfigure)

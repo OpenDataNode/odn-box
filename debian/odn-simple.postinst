@@ -287,14 +287,12 @@ set_unifiedviews() {
     echo ">>set_unifiedviews"
     HOSTNAME=$1
     FRONTEND_PROPS=/etc/unifiedviews/frontend-config.properties
-    UVIEWS_PORT=28080
-    CAS_PORT=38443
     
-    sed -i "s/#logout.url=.*/logout.url=http:\/\/$HOSTNAME:$UVIEWS_PORT\/unifiedviews\/cas_logout/" $FRONTEND_PROPS
-    sed -i "s/#cas.server.host=.*/cas.server.host=https:\/\/$HOSTNAME:$CAS_PORT\/cas/" $FRONTEND_PROPS
-    sed -i "s/#cas.security.check.url=.*/cas.security.check.url=http:\/\/$HOSTNAME:$UVIEWS_PORT\/unifiedviews\/login\/cas/" $FRONTEND_PROPS
-    sed -i "s/#cas.login.url=.*/cas.login.url=https:\/\/$HOSTNAME:$CAS_PORT\/cas\/login/" $FRONTEND_PROPS
-    sed -i "s/#cas.logout.url=.*/cas.logout.url=https:\/\/$HOSTNAME:$CAS_PORT\/cas\/logout?service=http%3A%2F%2F192.168.7.42%3A18080%2Funifiedviews%2F/" $FRONTEND_PROPS
+    sed -i "s/#logout.url=.*/logout.url=http:\/\/$HOSTNAME\/unifiedviews\/cas_logout/" $FRONTEND_PROPS
+    sed -i "s/#cas.server.host=.*/cas.server.host=https:\/\/$HOSTNAME\/cas/" $FRONTEND_PROPS
+    sed -i "s/#cas.security.check.url=.*/cas.security.check.url=http:\/\/$HOSTNAME:\/unifiedviews\/login\/cas/" $FRONTEND_PROPS
+    sed -i "s/#cas.login.url=.*/cas.login.url=https:\/\/$HOSTNAME\/cas\/login/" $FRONTEND_PROPS
+    sed -i "s/#cas.logout.url=.*/cas.logout.url=https:\/\/$HOSTNAME\/cas\/logout?service=http%3A%2F%2F192.168.7.42%3A18080%2Funifiedviews%2F/" $FRONTEND_PROPS
     
     sh /usr/share/unifiedviews/dist/plugins/deploy-dpus.sh
     sh /usr/share/unifiedviews/dist/odn_plugins/deploy-dpus.sh   

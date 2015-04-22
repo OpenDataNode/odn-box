@@ -6,4 +6,5 @@ midpoint/initial-objects/*  /usr/share/odn-midpoint/midpoint/WEB-INF/classes/ini
 publication/sparql/* var/www/sparql/
 publication/dump/* var/www/dump/
 apache/*  etc/odn-simple/
+midpoint/conf/* etc/odn-simple/odn-midpoint/
 cron/* /etc/cron.daily/

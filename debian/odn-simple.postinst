@@ -284,9 +284,12 @@ add_user_system() {
 }
 
 set_unifiedviews() {
-    echo ">>set_unifiedviews"
+    echo ">> set_unifiedviews"
     HOSTNAME=$1
     FRONTEND_PROPS=/etc/unifiedviews/frontend-config.properties
+    FRONTEND_PROPS_CAS=/usr/share/unifiedviews/frontend/WEB-INF/classes/cas-context-security.xml
+    BACKEND_PROPS=/etc/unifiedviews/backend-config.properties
+      
     
     sed -i "s/#logout.url=.*/logout.url=http:\/\/$HOSTNAME\/unifiedviews\/cas_logout/" $FRONTEND_PROPS
     sed -i "s/#cas.server.host=.*/cas.server.host=https:\/\/$HOSTNAME\/cas/" $FRONTEND_PROPS
@@ -297,8 +300,26 @@ set_unifiedviews() {
     sh /usr/share/unifiedviews/dist/plugins/deploy-dpus.sh
     sh /usr/share/unifiedviews/dist/odn_plugins/deploy-dpus.sh   
  
+    # set correct attribute in frontend
+    if grep -q "<b:property name=\"orgAttributeName\" value=\"ou\"\/>"  $FRONTEND_PROPS_CAS  ; then
+        echo "orgAttributeName has already been set for frontend"
+    else
+        echo "set orgAttributeName for frontend"
+        sed -i "s/\(<b:constructor-arg ref=\"userFacade\" \/>\)/\1   <b:property name=\"orgAttributeName\" value=\"ou\"\/>/" $FRONTEND_PROPS_CAS
+    fi
+    
+    # set correct parameter in backend
+    if grep -q "dpu.uv-l-filesToCkan.catalog.api.url" $BACKEND_PROPS ; then
+        echo "uv-l-filesToCkan has already been set for backend"
+    else 
+        echo "set uv-l-filesToCkan for backend"
+        echo "dpu.uv-l-filesToCkan.catalog.api.url = http://localhost/internalcatalog/api/action/internal_api" >> $BACKEND_PROPS
+        echo "dpu.uv-l-filesToCkan.secret.token = 2668e0d77ee3899a2" >> $BACKEND_PROPS
+    fi 
+ 
+ 
     unifiedviews_restart
-    echo "<<set_unifiedviews"
+    echo "<< set_unifiedviews"
 
 }
 

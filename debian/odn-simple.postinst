@@ -227,8 +227,9 @@ set_odn_ckan_for_cas() {
 }
 
 configure_filestore() {
-    echo ">> configure_filestore"
-        chown www-data:www-data /var/lib/odn-ckan-ic/storage
+    echo ">> configure_filestore $1 "
+        site=$1
+        chown www-data:www-data /var/lib/${site}/storage
 
     echo "<< configure_filestore"
 }
@@ -379,7 +380,7 @@ case "$1" in
     ckan_plugin_sync_confgure odn-ckan-ic
 	datastore_readonly_user_set_permission /etc/odn-simple/odn-ckan-ic/production.ini
     set_odn_ckan_for_cas odn-ckan-ic $hostname
-    configure_filestore
+    configure_filestore odn-ckan-ic
     # }
     # odn-ckan-pc {
     db_configure odn-ckan-pc odn
@@ -388,6 +389,7 @@ case "$1" in
     wsgi_configure odn-ckan-pc
     add_odn_ckan_pc_user
 	datastore_readonly_user_set_permission /etc/odn-simple/odn-ckan-pc/production.ini	
+    configure_filestore odn-ckan-pc
     #}
     # odn-ckan-ic and odn-ckan-pc {
     run_ckan_internationalization

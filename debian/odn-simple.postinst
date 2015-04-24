@@ -383,6 +383,7 @@ case "$1" in
     configure_filestore odn-ckan-ic
     # }
     # odn-ckan-pc {
+    set_ckans_hostname odn-ckan-pc $hostname
     db_configure odn-ckan-pc odn
     db_configure datastore-odn-pc odn
  	add_datastore_readonly_user ds_odn_pc odn-pc

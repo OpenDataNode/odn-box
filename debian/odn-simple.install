@@ -2,6 +2,9 @@ ckan-ic/* etc/odn-simple/odn-ckan-ic/
 ckan-pc/* etc/odn-simple/odn-ckan-pc/
 ckan-commons/* etc/odn-simple/odn-ckan-commons/
 solr/* etc/odn-solr/solr/
+midpoint/initial-objects/*  /usr/share/odn-midpoint/midpoint/WEB-INF/classes/initial-objects/
 publication/sparql/* var/www/sparql/
 publication/dump/* var/www/dump/
 apache/*  etc/odn-simple/
+midpoint/conf/* etc/odn-simple/odn-midpoint/
+cron/* /etc/cron.daily/

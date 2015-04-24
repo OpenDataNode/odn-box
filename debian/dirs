@@ -1,1 +1,3 @@
 var/cache/virtuoso/upload
+var/lib/odn-ckan-ic/storage
+var/lib/odn-ckan-pc/storage

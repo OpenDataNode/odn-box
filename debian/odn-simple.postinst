@@ -1,12 +1,6 @@
 #!/bin/sh
 set -e
 
-default_java() {
-    echo ">> default_java"
-   /usr/sbin/update-java-alternatives --jre-headless --set java-1.7.0-openjdk-amd64
-    echo "<<"
-}
-
 db_up() {
   echo ">> db_up"
 
@@ -35,8 +29,8 @@ db_up() {
 db_configure() {
   echo ">> db_configure: "$1" "$2
 
-  dbname="$1"
-  usrname="$2"
+  dbname=$1
+  usrname=$2
   CHK_PG_DB=$(su - postgres -c "psql -t -c \"select count(1) from pg_catalog.pg_database where datname = '${dbname}'\"")
   CHK_PG_USER=$(su - postgres -c "psql -t -c \"select count(1) from pg_user where usename = '${usrname}'\"")
   if [ ${CHK_PG_USER} -eq 0 ]
@@ -126,6 +120,34 @@ add_odn_ckan_ic_user() {
     echo "<< "
 }
 
+
+add_datastore_readonly_user() {
+   echo ">> add_datastore_readonly_user "$1" "$2
+   usrname=$1
+   password=$2
+   
+   su - postgres -c "psql -q -c \"CREATE USER ${usrname} WITH PASSWORD '${password}'\"" || true
+   echo "Done"
+
+}
+
+datastore_readonly_user_set_permission() {
+   echo ">> datastore_readonly_user_set_permission "$1
+   cfg_path=$1
+
+   if ! id postgres > /dev/null 2>&1 ; then
+      echo "user postgres is missing. Probably installation of postgresql went wrong"
+      exit -1
+   fi
+   
+   . /usr/share/python/odn-ckan-shared/bin/activate
+      paster --plugin=ckan datastore set-permissions -c ${cfg_path} | su postgres -c psql  || true
+      
+   deactivate
+   
+   echo "<< "
+}
+
 apache_restart() {
    echo ">> apache_restart"
 
@@ -155,11 +177,7 @@ set_virtuoso() {
     echo "<< "
 }
 
-
-set_ckans_hostname() {
-   echo ">> set_ckans_hostname: "$HOSTNAME
-   site=$1
-   
+get_hostname() {
     HOSTNAME=`hostname --all-fqdns`
     if [ -z ${HOSTNAME}  ]
     then
@@ -172,7 +190,15 @@ set_ckans_hostname() {
     fi
 
     HOSTNAME="$(echo "${HOSTNAME}" | tr -d '[[:space:]]')"    
-    echo " ${HOSTNAME}"
+    # return hostname
+    echo "$HOSTNAME"
+}
+
+
+set_ckans_hostname() {
+   echo ">> set_ckans_hostname: "$2
+   site=$1
+   HOSTNAME=$2
    
     sed --in-place \
         -e "s/\$HOSTNAME/$HOSTNAME/" \
@@ -180,62 +206,259 @@ set_ckans_hostname() {
     echo "<< "
 }
 
+generate_token() {
+    cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w ${1:-32} | head -n 1
+}
+
+set_ckans_api() {
+ echo ">> set_ckan_internal_api: "$1 
+   API_TOKEN=$1
+   
+    sed --in-place \
+        -e "s/\$API_TOKEN/$API_TOKEN/" \
+         /etc/odn-simple/odn-ckan-ic/production.ini
+
+    echo "<< "
+}
+
 run_ckan_internationalization() {
    echo ">> run_ckan_internationalization"
     . /usr/share/python/odn-ckan-shared/bin/activate
-    python /etc/odn-simple/odn-ckan-commons/odn_i18n.py --translation_file /etc/odn-simple/odn-ckan-commons/translations/sk/ckan.po
+    python /etc/odn-simple/odn-ckan-commons/odn_i18n.py
     deactivate
     echo "<< "
+}
+
+set_odn_ckan_for_cas() {
+    echo ">> set_odn_ckan_for_cas site: $1,  hostname: $2"
+    site=$1
+    HOSTNAME=$2
+
+    sed --in-place \
+        -e "s/\$HOSTNAME/$HOSTNAME/" \
+         /etc/odn-simple/${site}/who.ini
+
+    echo "<< "
+}
+
+configure_filestore() {
+    echo ">> configure_filestore $1 "
+        site=$1
+        chown www-data:www-data /var/lib/${site}/storage
+
+    echo "<< configure_filestore"
+}
+
+fix_perms_cron_job() {
+    # set cron jobs as executable 
+    # for update the tracking data and rebuild the search index - because popularity index
+    echo ">> fix_perms_cron_job"
+        chmod +x /etc/cron.daily/odn-ckan-ic
+        chmod +x /etc/cron.daily/odn-ckan-pc
+
+        echo "<< fix_perms_cron_job"
+}
+
+unifiedviews_restart() {
+  echo ">> unifiedviews_restart"
+  if [ -x "/etc/init.d/unifiedviews-backend" ]; then
+     if [ -x /usr/sbin/invoke-rc.d ]; then
+        invoke-rc.d unifiedviews-backend restart || true
+     else
+        /etc/init.d/unifiedviews-backend restart || true
+     fi
+  fi
+
+  if [ -x "/etc/init.d/unifiedviews-frontend" ]; then
+     if [ -x /usr/sbin/invoke-rc.d ]; then
+        invoke-rc.d unifiedviews-frontend restart || true
+       else
+         /etc/init.d/unifiedviews-frontend restart || true
+     fi
+  fi    
+  
+  echo "<< unifiedviews_restart"
 }
 
 
 add_user_system() {
   echo ">> add_user_system"
   groupadd uploaders || true    
-   
+  
+  #if user not exists
   if ! id uploader > /dev/null 2>&1 ; then
        useradd -g uploaders uploader -p $(perl -e'print crypt("uploader", "salt")') 
-       
   fi
+  
+  #if user exists for unifiedviews
+  if id unifiedviews > /dev/null 2>&1 ; then
+       usermod -a -G uploaders unifiedviews
+  fi 
   fix_perm
+  
   echo "<< "
 }
 
+set_unifiedviews() {
+    echo ">> set_unifiedviews"
+    HOSTNAME=$1
+    TOKEN=$2
+    FRONTEND_PROPS=/etc/unifiedviews/frontend-config.properties
+    FRONTEND_PROPS_CAS=/usr/share/unifiedviews/frontend/WEB-INF/classes/cas-context-security.xml
+    BACKEND_PROPS=/etc/unifiedviews/backend-config.properties
+    IC_API=http://$HOSTNAME/internalcatalog/api/action/internal_api
+    
+    sed -i "s/#logout.url=.*/logout.url=http:\/\/$HOSTNAME\/unifiedviews\/cas_logout/" $FRONTEND_PROPS
+    sed -i "s/#cas.server.host=.*/cas.server.host=https:\/\/$HOSTNAME\/cas/" $FRONTEND_PROPS
+    sed -i "s/#cas.security.check.url=.*/cas.security.check.url=http:\/\/$HOSTNAME:\/unifiedviews\/login\/cas/" $FRONTEND_PROPS
+    sed -i "s/#cas.login.url=.*/cas.login.url=https:\/\/$HOSTNAME\/cas\/login/" $FRONTEND_PROPS
+    sed -i "s/#cas.logout.url=.*/cas.logout.url=https:\/\/$HOSTNAME\/cas\/logout?service=http%3A%2F%2F192.168.7.42%3A18080%2Funifiedviews%2F/" $FRONTEND_PROPS
+    
+    sh /usr/share/unifiedviews/dist/plugins/deploy-dpus.sh
+    sh /usr/share/unifiedviews/dist/odn_plugins/deploy-dpus.sh   
+ 
+    # set correct attribute in frontend
+    if grep -q "<b:property name=\"orgAttributeName\" value=\"ou\"\/>"  $FRONTEND_PROPS_CAS  ; then
+        echo "orgAttributeName has already been set for frontend"
+    else
+        echo "set orgAttributeName for frontend"
+        sed -i "s/\(<b:constructor-arg ref=\"userFacade\" \/>\)/\1   <b:property name=\"orgAttributeName\" value=\"ou\"\/>/" $FRONTEND_PROPS_CAS
+    fi
+    
+    
+    # set correct parameter in backend
+    if grep -q "dpu.uv-l-filesToCkan.catalog.api.url" $BACKEND_PROPS ; then
+        echo "uv-l-filesToCkan has already been set for backend"
+    else 
+        echo "set uv-l-filesToCkan for backend"
+        echo "dpu.uv-l-filesToCkan.catalog.api.url = ${IC_API}" >> $BACKEND_PROPS
+        echo "dpu.uv-l-filesToCkan.secret.token = ${TOKEN}" >> $BACKEND_PROPS
+    fi 
+    
+    
+    # set correct parameter in backend
+    if grep -q "dpu.uv-l-rdfToCkan.catalog.api.url" $BACKEND_PROPS ; then
+        echo "uv-l-rdfToCkan has already been set for backend"
+    else 
+        echo "set uv-l-rdfToCkan for backend"
+        echo "dpu.uv-l-rdfToCkan.catalog.api.url = ${IC_API}" >> $BACKEND_PROPS
+        echo "dpu.uv-l-rdfToCkan.secret.token = ${TOKEN}" >> $BACKEND_PROPS
+    fi 
+    
+    
+    # set correct parameter in backend
+    if grep -q "dpu.uv-l-relationalToCkan.catalog.api.url" $BACKEND_PROPS ; then
+        echo "uv-l-relationalToCkan has already been set for backend"
+    else 
+        echo "set uv-l-relationalToCkan for backend"
+        echo "dpu.uv-l-relationalToCkan.catalog.api.url = ${IC_API}" >> $BACKEND_PROPS
+        echo "dpu.uv-l-relationalToCkan.secret.token = ${TOKEN}" >> $BACKEND_PROPS
+    fi 
+
+    
+    # set correct parameter in backend
+    if grep -q "dpu.uv-l-relationalDiffToCkan.catalog.api.url" $BACKEND_PROPS ; then
+        echo "uv-l-relationalDiffToCkan has already been set for backend"
+    else 
+        echo "set uv-l-relationalDiffToCkan for backend"
+        echo "dpu.uv-l-relationalDiffToCkan.catalog.api.url = ${IC_API}" >> $BACKEND_PROPS
+        echo "dpu.uv-l-relationalDiffToCkan.secret.token = ${TOKEN}" >> $BACKEND_PROPS
+    fi 
+    
+ 
+ 
+    unifiedviews_restart
+    echo "<< set_unifiedviews"
+
+}
 
 fix_perm() {
   echo ">> fix_perm"
-  chown -R uploader /var/cache/virtuoso/upload
-  chown -R uploader /var/www/dump
+  chown uploader:uploaders /var/cache/virtuoso/upload
+  chown uploader:uploaders /var/www/dump
+  chmod g+sw /var/www/dump
+  chmod g+sw /var/cache/virtuoso/upload
   echo "<< "
+}
+
+set_midpoint() {
+  echo ">> set_midpoint hostname: $1"
+  HOSTNAME=$1
+  
+  if [ -h /usr/share/odn-midpoint/midpoint/WEB-INF/ctx-web-security.xml  ] ; then 
+    unlink /usr/share/odn-midpoint/midpoint/WEB-INF/ctx-web-security.xml
+  fi
+  
+  if [ -h /usr/share/odn-midpoint/midpoint/WEB-INF/web.xml  ] ; then 
+    unlink /usr/share/odn-midpoint/midpoint/WEB-INF/web.xml
+  fi
+  
+  # set domain name  
+  sed --in-place \
+        -e "s/\$HOSTNAME/$HOSTNAME/" \
+         /etc/odn-simple/odn-midpoint/ctx-web-security.xml 
+  
+  ln -s  /etc/odn-simple/odn-midpoint/ctx-web-security.xml  /usr/share/odn-midpoint/midpoint/WEB-INF/ctx-web-security.xml 
+  ln -s  /etc/odn-simple/odn-midpoint/web.xml  /usr/share/odn-midpoint/midpoint/WEB-INF/web.xml
+  
+  chown -R odn-midpoint /etc/odn-simple/odn-midpoint
+  chown -R odn-midpoint /usr/share/odn-midpoint/midpoint/WEB-INF/web.xml 
+  chown -R odn-midpoint /usr/share/odn-midpoint/midpoint/WEB-INF/ctx-web-security.xml
+  chown -R odn-midpoint /var/lib/midpoint.home/
+    
+  invoke-rc.d odn-midpoint restart
+  echo "<< set_midpoint"
 }
 
 case "$1" in
   configure)
-    set_ckans_hostname odn-ckan-ic
-    service odn-solr restart
+    hostname=$(get_hostname)
+    invoke-rc.d odn-solr restart
     echo "wait for restart"
     # TODO think about clever waiting
     sleep 10
-    default_java
     db_up
+    token=$(generate_token)
+    # odn-ckan-ic {
+    set_ckans_hostname odn-ckan-ic $hostname
+    set_ckans_api $token
     db_configure odn-ckan-ic odn
+    db_configure datastore-odn-ic odn
+    add_datastore_readonly_user ds_odn_ic odn-ic
     wsgi_configure odn-ckan-ic
     pipeline_configure odn-ckan-ic
-    db_configure odn-ckan-pc odn
-    wsgi_configure odn-ckan-pc
     ckan_plugin_sync_confgure odn-ckan-ic
-    add_odn_ckan_ic_user
+	datastore_readonly_user_set_permission /etc/odn-simple/odn-ckan-ic/production.ini
+    set_odn_ckan_for_cas odn-ckan-ic $hostname
+    configure_filestore odn-ckan-ic
+    # }
+    # odn-ckan-pc {
+    set_ckans_hostname odn-ckan-pc $hostname
+    db_configure odn-ckan-pc odn
+    db_configure datastore-odn-pc odn
+ 	add_datastore_readonly_user ds_odn_pc odn-pc
+    wsgi_configure odn-ckan-pc
     add_odn_ckan_pc_user
+	datastore_readonly_user_set_permission /etc/odn-simple/odn-ckan-pc/production.ini	
+    configure_filestore odn-ckan-pc
+    #}
+    # odn-ckan-ic and odn-ckan-pc {
     run_ckan_internationalization
+    fix_perms_cron_job
+    # }
     a2dissite default
     a2ensite odn-simple
+    a2ensite odn-cas-ssl
 	a2enmod proxy 
 	a2enmod proxy_http
 	a2enmod proxy_connect
     a2enmod wsgi
 	a2enmod rewrite	
+    a2enmod ssl proxy_ajp
     apache_restart
     set_virtuoso
+    set_unifiedviews $hostname $token
+    set_midpoint $hostname
   ;;
 
   abort-upgrade|abort-remove|abort-deconfigure)

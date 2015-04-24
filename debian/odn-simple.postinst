@@ -206,6 +206,21 @@ set_ckans_hostname() {
     echo "<< "
 }
 
+generate_token() {
+    cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w ${1:-32} | head -n 1
+}
+
+set_ckans_api() {
+ echo ">> set_ckan_internal_api: "$1 
+   API_TOKEN=$1
+   
+    sed --in-place \
+        -e "s/\$API_TOKEN/$API_TOKEN/" \
+         /etc/odn-simple/odn-ckan-ic/production.ini
+
+    echo "<< "
+}
+
 run_ckan_internationalization() {
    echo ">> run_ckan_internationalization"
     . /usr/share/python/odn-ckan-shared/bin/activate
@@ -287,10 +302,11 @@ add_user_system() {
 set_unifiedviews() {
     echo ">> set_unifiedviews"
     HOSTNAME=$1
+    TOKEN=$2
     FRONTEND_PROPS=/etc/unifiedviews/frontend-config.properties
     FRONTEND_PROPS_CAS=/usr/share/unifiedviews/frontend/WEB-INF/classes/cas-context-security.xml
     BACKEND_PROPS=/etc/unifiedviews/backend-config.properties
-      
+    IC_API=http://$HOSTNAME/internalcatalog/api/action/internal_api
     
     sed -i "s/#logout.url=.*/logout.url=http:\/\/$HOSTNAME\/unifiedviews\/cas_logout/" $FRONTEND_PROPS
     sed -i "s/#cas.server.host=.*/cas.server.host=https:\/\/$HOSTNAME\/cas/" $FRONTEND_PROPS
@@ -309,14 +325,46 @@ set_unifiedviews() {
         sed -i "s/\(<b:constructor-arg ref=\"userFacade\" \/>\)/\1   <b:property name=\"orgAttributeName\" value=\"ou\"\/>/" $FRONTEND_PROPS_CAS
     fi
     
+    
     # set correct parameter in backend
     if grep -q "dpu.uv-l-filesToCkan.catalog.api.url" $BACKEND_PROPS ; then
         echo "uv-l-filesToCkan has already been set for backend"
     else 
         echo "set uv-l-filesToCkan for backend"
-        echo "dpu.uv-l-filesToCkan.catalog.api.url = http://localhost/internalcatalog/api/action/internal_api" >> $BACKEND_PROPS
-        echo "dpu.uv-l-filesToCkan.secret.token = 2668e0d77ee3899a2" >> $BACKEND_PROPS
+        echo "dpu.uv-l-filesToCkan.catalog.api.url = ${IC_API}" >> $BACKEND_PROPS
+        echo "dpu.uv-l-filesToCkan.secret.token = ${TOKEN}" >> $BACKEND_PROPS
     fi 
+    
+    
+    # set correct parameter in backend
+    if grep -q "dpu.uv-l-rdfToCkan.catalog.api.url" $BACKEND_PROPS ; then
+        echo "uv-l-rdfToCkan has already been set for backend"
+    else 
+        echo "set uv-l-rdfToCkan for backend"
+        echo "dpu.uv-l-rdfToCkan.catalog.api.url = ${IC_API}" >> $BACKEND_PROPS
+        echo "dpu.uv-l-rdfToCkan.secret.token = ${TOKEN}" >> $BACKEND_PROPS
+    fi 
+    
+    
+    # set correct parameter in backend
+    if grep -q "dpu.uv-l-relationalToCkan.catalog.api.url" $BACKEND_PROPS ; then
+        echo "uv-l-relationalToCkan has already been set for backend"
+    else 
+        echo "set uv-l-relationalToCkan for backend"
+        echo "dpu.uv-l-relationalToCkan.catalog.api.url = ${IC_API}" >> $BACKEND_PROPS
+        echo "dpu.uv-l-relationalToCkan.secret.token = ${TOKEN}" >> $BACKEND_PROPS
+    fi 
+
+    
+    # set correct parameter in backend
+    if grep -q "dpu.uv-l-relationalDiffToCkan.catalog.api.url" $BACKEND_PROPS ; then
+        echo "uv-l-relationalDiffToCkan has already been set for backend"
+    else 
+        echo "set uv-l-relationalDiffToCkan for backend"
+        echo "dpu.uv-l-relationalDiffToCkan.catalog.api.url = ${IC_API}" >> $BACKEND_PROPS
+        echo "dpu.uv-l-relationalDiffToCkan.secret.token = ${TOKEN}" >> $BACKEND_PROPS
+    fi 
+    
  
  
     unifiedviews_restart
@@ -370,8 +418,10 @@ case "$1" in
     # TODO think about clever waiting
     sleep 10
     db_up
+    token=$(generate_token)
     # odn-ckan-ic {
     set_ckans_hostname odn-ckan-ic $hostname
+    set_ckans_api $token
     db_configure odn-ckan-ic odn
     db_configure datastore-odn-ic odn
     add_datastore_readonly_user ds_odn_ic odn-ic
@@ -407,7 +457,7 @@ case "$1" in
     a2enmod ssl proxy_ajp
     apache_restart
     set_virtuoso
-    set_unifiedviews $hostname
+    set_unifiedviews $hostname $token
     set_midpoint $hostname
   ;;
 

@@ -162,6 +162,14 @@
   ProxyRequests       Off
   ProxyPreserveHost   On
 
-  ProxyPass           /cas           ajp://localhost:8009/cas
+  ProxyPass           /cas           ajp://localhost:38009/cas
+  ProxyPassReverse    /cas           ajp://localhost:38009/cas
+  ProxyPass           /unifiedviews  ajp://localhost:28009/unifiedviews
+  ProxyPassReverse    /unifiedviews  ajp://localhost:28009/unifiedviews
+  ProxyPass           /midpoint      ajp://localhost:18009/midpoint
+  ProxyPassReverse    /midpoint      ajp://localhost:18009/midpoint
+
+
+
 </VirtualHost>
 </IfModule>

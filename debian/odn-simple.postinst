@@ -448,7 +448,7 @@ case "$1" in
     # }
     a2dissite default
     a2ensite odn-simple
-    a2ensite odn-cas-ssl
+    a2ensite odn-simple-ssl
 	a2enmod proxy 
 	a2enmod proxy_http
 	a2enmod proxy_connect

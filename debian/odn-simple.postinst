@@ -310,7 +310,7 @@ set_unifiedviews() {
     
     sed -i "s/#logout.url=.*/logout.url=https:\/\/$HOSTNAME\/unifiedviews\/cas_logout/" $FRONTEND_PROPS
     sed -i "s/#cas.server.host=.*/cas.server.host=https:\/\/localhost:38443\/cas/" $FRONTEND_PROPS
-    sed -i "s/#cas.security.check.url=.*/cas.security.check.url=https:\/\/$HOSTNAME:\/unifiedviews\/login\/cas/" $FRONTEND_PROPS
+    sed -i "s/#cas.security.check.url=.*/cas.security.check.url=https:\/\/$HOSTNAME\/unifiedviews\/login\/cas/" $FRONTEND_PROPS
     sed -i "s/#cas.login.url=.*/cas.login.url=https:\/\/$HOSTNAME\/cas\/login/" $FRONTEND_PROPS
     sed -i "s/#cas.logout.url=.*/cas.logout.url=https:\/\/$HOSTNAME\/cas\/logout/" $FRONTEND_PROPS
     

@@ -449,7 +449,7 @@ case "$1" in
     a2ensite odn-simple
     a2ensite odn-simple-ssl
     a2ensite odn-ckan-pc
-    #a2ensite odn-ckan-ic
+    a2ensite odn-ckan-ic
 	a2enmod proxy
 	a2enmod proxy_http
 	a2enmod proxy_connect

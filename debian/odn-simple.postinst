@@ -68,7 +68,6 @@ wsgi_configure() {
   site=$1
    echo -n "INFO: Ckan db init "${site}
   /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckan db init -c /etc/odn-simple/${site}/production.ini
-  a2ensite ${site}
    echo "<<"
 
 }
@@ -147,6 +146,15 @@ datastore_readonly_user_set_permission() {
    
    echo "<< "
 }
+
+apache_ssl() {
+    CAS_TOMCAT_JAVA_KEYSTORE=/usr/share/odn-cas/conf/.keystore
+    keytool -importkeystore -srckeystore $CAS_TOMCAT_JAVA_KEYSTORE -destkeystore keystore.p12 -deststoretype PKCS12 -srcstorepass changeit -srcalias tomcat -deststorepass changeit -destkeypass changeit -noprompt
+    openssl pkcs12 -in keystore.p12  -nokeys -out /etc/ssl/certs/odn-cert.pem -passin pass:changeit
+    openssl pkcs12 -in keystore.p12  -nodes -nocerts -out /etc/ssl/private/odn-key.pem -passin pass:changeit
+    rm keystore.p12 || true
+}
+
 
 apache_restart() {
    echo ">> apache_restart"
@@ -306,13 +314,15 @@ set_unifiedviews() {
     FRONTEND_PROPS=/etc/unifiedviews/frontend-config.properties
     FRONTEND_PROPS_CAS=/usr/share/unifiedviews/frontend/WEB-INF/classes/cas-context-security.xml
     BACKEND_PROPS=/etc/unifiedviews/backend-config.properties
-    IC_API=http://$HOSTNAME/internalcatalog/api/action/internal_api
-    
-    sed -i "s/#logout.url=.*/logout.url=http:\/\/$HOSTNAME\/unifiedviews\/cas_logout/" $FRONTEND_PROPS
-    sed -i "s/#cas.server.host=.*/cas.server.host=https:\/\/$HOSTNAME\/cas/" $FRONTEND_PROPS
-    sed -i "s/#cas.security.check.url=.*/cas.security.check.url=http:\/\/$HOSTNAME:\/unifiedviews\/login\/cas/" $FRONTEND_PROPS
+    IC_API=http://localhost:9080/internalcatalog/api/action/internal_api
+   
+    sed -i "s/locale.*/locale=en/" $FRONTEND_PROPS
+ 
+    sed -i "s/#logout.url=.*/logout.url=https:\/\/$HOSTNAME\/unifiedviews\/cas_logout/" $FRONTEND_PROPS
+    sed -i "s/#cas.server.host=.*/cas.server.host=https:\/\/localhost:38443\/cas/" $FRONTEND_PROPS
+    sed -i "s/#cas.security.check.url=.*/cas.security.check.url=https:\/\/$HOSTNAME\/unifiedviews\/login\/cas/" $FRONTEND_PROPS
     sed -i "s/#cas.login.url=.*/cas.login.url=https:\/\/$HOSTNAME\/cas\/login/" $FRONTEND_PROPS
-    sed -i "s/#cas.logout.url=.*/cas.logout.url=https:\/\/$HOSTNAME\/cas\/logout?service=http%3A%2F%2F192.168.7.42%3A18080%2Funifiedviews%2F/" $FRONTEND_PROPS
+    sed -i "s/#cas.logout.url=.*/cas.logout.url=https:\/\/$HOSTNAME\/cas\/logout/" $FRONTEND_PROPS
     
     sh /usr/share/unifiedviews/dist/plugins/deploy-dpus.sh
     sh /usr/share/unifiedviews/dist/odn_plugins/deploy-dpus.sh   
@@ -448,13 +458,17 @@ case "$1" in
     # }
     a2dissite default
     a2ensite odn-simple
-    a2ensite odn-cas-ssl
-	a2enmod proxy 
+    a2ensite odn-simple-ssl
+    a2ensite odn-ckan-pc
+    a2ensite odn-ckan-ic
+	a2enmod proxy
 	a2enmod proxy_http
 	a2enmod proxy_connect
+    a2enmod headers
     a2enmod wsgi
 	a2enmod rewrite	
     a2enmod ssl proxy_ajp
+    apache_ssl
     apache_restart
     set_virtuoso
     set_unifiedviews $hostname $token

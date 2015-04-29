@@ -147,6 +147,15 @@ datastore_readonly_user_set_permission() {
    echo "<< "
 }
 
+apache_ssl() {
+    CAS_TOMCAT_JAVA_KEYSTORE=/usr/share/odn-cas/conf/.keystore
+    keytool -importkeystore -srckeystore $CAS_TOMCAT_JAVA_KEYSTORE -destkeystore keystore.p12 -deststoretype PKCS12 -srcalias tomcat -deststorepass changeit -destkeypass changeit
+    openssl pkcs12 -in keystore.p12  -nokeys -out /etc/ssl/certs/odn-cert.pem
+    openssl pkcs12 -in keystore.p12  -nodes -nocerts -out /etc/ssl/private/odn-key.pem
+    rm keystore.p12 || true
+}
+
+
 apache_restart() {
    echo ">> apache_restart"
 
@@ -456,6 +465,7 @@ case "$1" in
     a2enmod wsgi
 	a2enmod rewrite	
     a2enmod ssl proxy_ajp
+    apache_ssl
     apache_restart
     set_virtuoso
     set_unifiedviews $hostname $token

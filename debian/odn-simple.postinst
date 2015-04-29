@@ -314,7 +314,7 @@ set_unifiedviews() {
     FRONTEND_PROPS=/etc/unifiedviews/frontend-config.properties
     FRONTEND_PROPS_CAS=/usr/share/unifiedviews/frontend/WEB-INF/classes/cas-context-security.xml
     BACKEND_PROPS=/etc/unifiedviews/backend-config.properties
-    IC_API=http://$HOSTNAME/internalcatalog/api/action/internal_api
+    IC_API=http://localhost:9080/internalcatalog/api/action/internal_api
     
     sed -i "s/#logout.url=.*/logout.url=https:\/\/$HOSTNAME\/unifiedviews\/cas_logout/" $FRONTEND_PROPS
     sed -i "s/#cas.server.host=.*/cas.server.host=https:\/\/localhost:38443\/cas/" $FRONTEND_PROPS
@@ -458,10 +458,11 @@ case "$1" in
     a2ensite odn-simple
     a2ensite odn-simple-ssl
     a2ensite odn-ckan-pc
-    #a2ensite odn-ckan-ic
+    a2ensite odn-ckan-ic
 	a2enmod proxy
 	a2enmod proxy_http
 	a2enmod proxy_connect
+    a2enmod headers
     a2enmod wsgi
 	a2enmod rewrite	
     a2enmod ssl proxy_ajp

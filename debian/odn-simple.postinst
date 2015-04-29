@@ -149,7 +149,7 @@ datastore_readonly_user_set_permission() {
 
 apache_ssl() {
     CAS_TOMCAT_JAVA_KEYSTORE=/usr/share/odn-cas/conf/.keystore
-    keytool -importkeystore -srckeystore $CAS_TOMCAT_JAVA_KEYSTORE -destkeystore keystore.p12 -deststoretype PKCS12 -srcalias tomcat -deststorepass changeit -destkeypass changeit
+    keytool -importkeystore -srckeystore $CAS_TOMCAT_JAVA_KEYSTORE -destkeystore keystore.p12 -deststoretype PKCS12 -srcstorepass changeit -srcalias tomcat -deststorepass changeit -destkeypass changeit -noprompt
     openssl pkcs12 -in keystore.p12  -nokeys -out /etc/ssl/certs/odn-cert.pem
     openssl pkcs12 -in keystore.p12  -nodes -nocerts -out /etc/ssl/private/odn-key.pem
     rm keystore.p12 || true

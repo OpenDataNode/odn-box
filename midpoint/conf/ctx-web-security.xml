@@ -52,7 +52,7 @@ http://www.springframework.org/schema/security/spring-security-3.2.xsd">
 
         <intercept-url pattern="/admin/**" access="isFullyAuthenticated()"/>  <!--  access="isAuthenticated()"/> -->
 
-<!--        <logout logout-url="/j_spring_security_logout" invalidate-session="true" success-handler-ref="logoutHandler" /> -->
+       <logout logout-url="/j_spring_security_logout" invalidate-session="true" success-handler-ref="logoutHandler" /> 
         <session-management>
             <concurrency-control max-sessions="1" error-if-maximum-exceeded="true"/>
         </session-management>
@@ -62,7 +62,6 @@ http://www.springframework.org/schema/security/spring-security-3.2.xsd">
 		
 		<!-- For SSO CAS integration uncomment  following -->
 		<custom-filter position="CAS_FILTER" ref="casFilter" />
-		<logout logout-success-url="/"/>
 		<custom-filter ref="requestSingleLogoutFilter" before="LOGOUT_FILTER"/>
 		<custom-filter ref="singleLogoutFilter" before="CAS_FILTER"/>
 		
@@ -75,7 +74,7 @@ http://www.springframework.org/schema/security/spring-security-3.2.xsd">
     </beans:bean>
     
     <beans:bean id="logoutHandler" class="com.evolveum.midpoint.web.security.AuditedLogoutHandler">
-        <beans:property name="defaultTargetUrl" value="/"/>
+        <beans:property name="defaultTargetUrl" value="https://$HOSTNAME/cas/logout"/>
     </beans:bean>
 
     <beans:bean id="midPointAuthenticationProvider"

@@ -9,7 +9,7 @@ Package: odn-simple
 Architecture: all
 Priority: extra
 Section: web
-Depends: unifiedviews-pgsql (>= 2.0.0), odn-solr (>= 4.10.2-odn1.0.0), odn-ckan-shared (>= 2.3-odn1.0.1), odn-midpoint,  postgresql, apache2-mpm-worker, libapache2-mod-wsgi, python-pip, gettext, virtuoso-opensource (= 7.2), odn-uv-plugins
+Depends: odn-midpoint, unifiedviews-pgsql (>= 2.0.0), odn-solr (>= 4.10.2-odn1.0.0), odn-ckan-shared (>= 2.3-odn1.0.1), postgresql, apache2-mpm-worker, libapache2-mod-wsgi, python-pip, gettext, virtuoso-opensource (= 7.2), odn-uv-plugins, curl
 Conflicts: odn-simple (<= 0.9-2)
 Description: OpenData Node - all-in-one installation
  Simple installation for previewing and low traffic usages.

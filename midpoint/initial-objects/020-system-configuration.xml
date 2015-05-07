@@ -1,0 +1,96 @@
+	<systemConfiguration xmlns="http://midpoint.evolveum.com/xml/ns/public/common/common-3"
+                     oid="00000000-0000-0000-0000-000000000001"
+                     version="5">
+   <name>SystemConfiguration</name>
+   <globalPasswordPolicyRef xmlns:tns="http://midpoint.evolveum.com/xml/ns/public/common/common-3"
+                            oid="00000000-0000-0000-0000-000000000003"
+                            type="tns:ValuePolicyType"><!-- Default Password Policy --></globalPasswordPolicyRef>
+   <logging>
+      <classLogger>
+         <level>DEBUG</level>
+         <package>com.evolveum.midpoint.model</package>
+      </classLogger>
+      <classLogger>
+         <level>INFO</level>
+         <package>com.evolveum.midpoint.model.lens.Clockwork</package>
+      </classLogger>
+      <classLogger>
+         <level>INFO</level>
+         <package>com.evolveum.midpoint.model.lens.projector.Projector</package>
+      </classLogger>
+      <classLogger>
+         <level>DEBUG</level>
+         <package>com.evolveum.midpoint.web</package>
+      </classLogger>
+      <classLogger>
+         <level>OFF</level>
+         <package>net.sf.jasperreports.engine.fill.JRFillDataset</package>
+      </classLogger>
+      <classLogger>
+         <level>WARN</level>
+         <package>org.apache.wicket.resource.PropertiesFactory</package>
+      </classLogger>
+      <classLogger>
+         <level>OFF</level>
+         <package>org.hibernate.engine.jdbc.batch.internal.BatchingBatch</package>
+      </classLogger>
+      <classLogger>
+         <level>OFF</level>
+         <package>org.hibernate.engine.jdbc.spi.SqlExceptionHelper</package>
+      </classLogger>
+      <appender xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                name="IDM-PROFILE_LOG"
+                xsi:type="FileAppenderConfigurationType">
+         <pattern>%date %level: %msg%n</pattern>
+         <fileName>${catalina.base}/logs/idm-profile.log</fileName>
+         <filePattern>${catalina.base}/logs/idm-profile-%d{yyyy-MM-dd}.%i.log</filePattern>
+         <maxHistory>10</maxHistory>
+         <maxFileSize>100MB</maxFileSize>
+         <append>true</append>
+      </appender>
+      <appender xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                name="IDM_LOG"
+                xsi:type="FileAppenderConfigurationType">
+         <pattern>%date [%X{subsystem}] [%thread] %level \(%logger\): %msg%n</pattern>
+         <fileName>${catalina.base}/logs/idm.log</fileName>
+         <filePattern>${catalina.base}/logs/idm-%d{yyyy-MM-dd}.%i.log</filePattern>
+         <maxHistory>10</maxHistory>
+         <maxFileSize>100MB</maxFileSize>
+         <append>true</append>
+      </appender>
+      <rootLoggerAppender>IDM_LOG</rootLoggerAppender>
+      <rootLoggerLevel>TRACE</rootLoggerLevel>
+      <auditing>
+         <enabled>false</enabled>
+         <details>false</details>
+      </auditing>
+   </logging>
+   <defaultUserTemplateRef xmlns:tns="http://midpoint.evolveum.com/xml/ns/public/common/common-3"
+                           oid="10000000-0000-0000-0000-000000000222"
+                           type="tns:ObjectTemplateType"/>
+   <notificationConfiguration>
+      <mail>
+         <debug>false</debug>
+      </mail>
+   </notificationConfiguration>
+   <profilingConfiguration>
+      <enabled>false</enabled>
+      <requestFilter>false</requestFilter>
+      <performanceStatistics>false</performanceStatistics>
+      <model>false</model>
+      <repository>false</repository>
+      <provisioning>false</provisioning>
+      <ucf>false</ucf>
+      <resourceObjectChangeListener>false</resourceObjectChangeListener>
+      <taskManager>false</taskManager>
+      <workflow>false</workflow>
+   </profilingConfiguration>
+   <cleanupPolicy>
+      <auditRecords>
+         <maxAge>P3M</maxAge>
+      </auditRecords>
+      <closedTasks>
+         <maxAge>P1M</maxAge>
+      </closedTasks>
+   </cleanupPolicy>
+</systemConfiguration>

@@ -401,6 +401,21 @@ set_midpoint() {
   echo ">> set_midpoint hostname: $1"
   HOSTNAME=$1
   
+  # upload initial-objects {
+  # system-configuration
+  curl --user administrator:5ecr3t -H "Content-Type: application/xml" -X PUT http://localhost:18080/midpoint/ws/rest/systemConfigurations/00000000-0000-0000-0000-000000000001 -d @/usr/share/odn-midpoint/initial-objects/020-system-configuration.xml -v
+  # openLDAP
+  curl --user administrator:5ecr3t -H "Content-Type: application/xml" -X PUT http://localhost:18080/midpoint/ws/rest/resources/11111111-0000-0000-0000-000000000002 -d @/usr/share/odn-midpoint/initial-objects/205-resource-openLDAP.xml -v
+  # role administrator
+  curl --user administrator:5ecr3t -H "Content-Type: application/xml" -X PUT http://localhost:18080/midpoint/ws/rest/roles/11111111-0000-0000-0000-000000000003 -d @/usr/share/odn-midpoint/initial-objects/201-role-administrator.xml -v
+  # role user
+  curl --user administrator:5ecr3t -H "Content-Type: application/xml" -X PUT http://localhost:18080/midpoint/ws/rest/roles/11111111-0000-0000-0000-000000000004 -d @/usr/share/odn-midpoint/initial-objects/202-role-user.xml -v
+  # template user
+  curl --user administrator:5ecr3t -H "Content-Type: application/xml" -X PUT http://localhost:18080/midpoint/ws/rest/objectTemplates/10000000-0000-0000-0000-000000000222 -d @/usr/share/odn-midpoint/initial-objects/203-object-template-user.xml -v
+  # user cas admin
+  curl --user administrator:5ecr3t -H "Content-Type: application/xml" -X PUT http://localhost:18080/midpoint/ws/rest/users/11111111-0000-0000-0000-000000000001 -d @/usr/share/odn-midpoint/initial-objects/205-user-cas-admin.xml -v
+  #}
+  
   if [ -h /usr/share/odn-midpoint/midpoint/WEB-INF/ctx-web-security.xml  ] ; then 
     unlink /usr/share/odn-midpoint/midpoint/WEB-INF/ctx-web-security.xml
   fi

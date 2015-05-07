@@ -41,7 +41,7 @@ http://www.springframework.org/schema/security/spring-security-3.2.xsd">
     <http pattern="/wicket/resource/**" security="none"/>
 
 	<!-- add following: entry-point-ref="casEntryPoint"  to the http element before create-session attribute -->
-    <http entry-point-ref="casEntryPoint" create-session="never" auto-config="true" use-expressions="false" access-decision-manager-ref="accessDecisionManager">
+    <http create-session="never" auto-config="true" use-expressions="false" access-decision-manager-ref="accessDecisionManager">
         <intercept-url pattern="/j_spring_security_check" />
         <intercept-url pattern="/spring_security_login" />
 
@@ -52,7 +52,7 @@ http://www.springframework.org/schema/security/spring-security-3.2.xsd">
 
         <intercept-url pattern="/admin/**" access="isFullyAuthenticated()"/>  <!--  access="isAuthenticated()"/> -->
 
-<!--        <logout logout-url="/j_spring_security_logout" invalidate-session="true" success-handler-ref="logoutHandler" /> -->
+        <logout logout-url="/j_spring_security_logout" invalidate-session="true" success-handler-ref="logoutHandler" /> 
         <session-management>
             <concurrency-control max-sessions="1" error-if-maximum-exceeded="true"/>
         </session-management>
@@ -62,7 +62,7 @@ http://www.springframework.org/schema/security/spring-security-3.2.xsd">
 		
 		<!-- For SSO CAS integration uncomment  following -->
 		<custom-filter position="CAS_FILTER" ref="casFilter" />
-		<logout logout-success-url="/"/>
+		<logout logout-success-url="/cas-logout.jsp"/>
 		<custom-filter ref="requestSingleLogoutFilter" before="LOGOUT_FILTER"/>
 		<custom-filter ref="singleLogoutFilter" before="CAS_FILTER"/>
 		

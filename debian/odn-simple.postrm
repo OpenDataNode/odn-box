@@ -32,7 +32,12 @@ case "$1" in
 	    unlink  /usr/share/odn-midpoint/midpoint/WEB-INF/web.xml  
         ln -s /usr/share/odn-midpoint/midpoint/WEB-INF/web_default.xml /usr/share/odn-midpoint/midpoint/WEB-INF/web.xml  
 	fi
-    
+
+    if [ -f /usr/share/unifiedviews/frontend/WEB-INF/web.xml  ] ; then
+        mv  /usr/share/unifiedviews/frontend/WEB-INF/web.xml /usr/share/unifiedviews/frontend/WEB-INF/web_sso.xml
+        mv  /usr/share/unifiedviews/frontend/WEB-INF/web_default.xml /usr/share/unifiedviews/frontend/WEB-INF/web.xml
+    fi
+
     # reload default odn-simple configuration
     if [ -x "/etc/init.d/odn-midpoint" ]; then
         invoke-rc.d odn-midpoint start || true

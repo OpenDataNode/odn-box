@@ -309,6 +309,12 @@ add_user_system() {
 
 set_unifiedviews() {
     echo ">> set_unifiedviews"
+
+    UV_DIR=/usr/share/unifiedviews
+
+    mv $UV_DIR/frontend/WEB-INF/web.xml $UV_DIR/frontend/WEB-INF/web_default.xml
+    mv $UV_DIR/frontend/WEB-INF/web_sso.xml $UV_DIR/frontend/WEB-INF/web.xml
+
     HOSTNAME=$1
     TOKEN=$2
     FRONTEND_PROPS=/etc/unifiedviews/frontend-config.properties

@@ -35,6 +35,9 @@ case "$1" in
 
     if [ -f /usr/share/unifiedviews/frontend/WEB-INF/web.xml  ] ; then
         mv  /usr/share/unifiedviews/frontend/WEB-INF/web.xml /usr/share/unifiedviews/frontend/WEB-INF/web_sso.xml
+    fi
+
+    if [ -f /usr/share/unifiedviews/frontend/WEB-INF/web_default.xml  ] ; then
         mv  /usr/share/unifiedviews/frontend/WEB-INF/web_default.xml /usr/share/unifiedviews/frontend/WEB-INF/web.xml
     fi
 

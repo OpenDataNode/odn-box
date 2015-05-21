@@ -59,7 +59,7 @@
          <append>true</append>
       </appender>
       <rootLoggerAppender>IDM_LOG</rootLoggerAppender>
-      <rootLoggerLevel>TRACE</rootLoggerLevel>
+      <rootLoggerLevel>INFO</rootLoggerLevel>
       <auditing>
          <enabled>false</enabled>
          <details>false</details>

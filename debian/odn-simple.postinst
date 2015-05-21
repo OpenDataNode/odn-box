@@ -322,7 +322,7 @@ set_unifiedviews() {
     BACKEND_PROPS=/etc/unifiedviews/backend-config.properties
     IC_API=http://localhost:9080/internalcatalog/api/action/internal_api
    
-    sed -i "s/#behindProxy=.*/behindProxy=false/" $FRONTEND_PROPS
+    sed -i "s/#behindProxy=.*/behindProxy=true/" $FRONTEND_PROPS
     sed -i "s/#logout.url=.*/logout.url=https:\/\/$HOSTNAME\/unifiedviews\/cas_logout/" $FRONTEND_PROPS
     sed -i "s/#cas.server.host=.*/cas.server.host=https:\/\/localhost:38443\/cas/" $FRONTEND_PROPS
     sed -i "s/#cas.security.check.url=.*/cas.security.check.url=\/unifiedviews\/login\/cas/" $FRONTEND_PROPS

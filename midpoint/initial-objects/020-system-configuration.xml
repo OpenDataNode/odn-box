@@ -7,7 +7,7 @@
                             type="tns:ValuePolicyType"><!-- Default Password Policy --></globalPasswordPolicyRef>
    <logging>
       <classLogger>
-         <level>DEBUG</level>
+         <level>INFO</level>
          <package>com.evolveum.midpoint.model</package>
       </classLogger>
       <classLogger>
@@ -19,7 +19,7 @@
          <package>com.evolveum.midpoint.model.lens.projector.Projector</package>
       </classLogger>
       <classLogger>
-         <level>DEBUG</level>
+         <level>INFO</level>
          <package>com.evolveum.midpoint.web</package>
       </classLogger>
       <classLogger>

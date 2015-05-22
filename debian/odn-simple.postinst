@@ -347,6 +347,9 @@ set_unifiedviews() {
         sed -i "s/dpu.uv-l-filesToCkan.secret.token/org.opendatanode.CKAN.secret.token/" $BACKEND_PROPS
         echo "org.opendatanode.CKAN.http.header.X-Forwarded-Host = $HOSTNAME" >> $BACKEND_PROPS
         echo "org.opendatanode.CKAN.http.header.X-Forwarded-Proto = https" >> $BACKEND_PROPS
+    
+    if grep -q "org.opendatanode.CKAN.api.url" $BACKEND_PROPS ; then
+        echo "org.opendatanode.CKAN.api.url has been set at backend"
     else
         echo "org.opendatanode.CKAN.secret.token = $TOKEN" >> $BACKEND_PROPS
         echo "org.opendatanode.CKAN.api.url = ${IC_API}" >> $BACKEND_PROPS

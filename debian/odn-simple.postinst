@@ -341,15 +341,15 @@ set_unifiedviews() {
     fi
 
     # remove deprected parameter and correct one in backend
-    if grep -q "dpu.uv-l-filesToCkan.catalog.api.url" $BACKEND_PROPS ; then
+    if grep -q "dpu.uv-l-filesToCkan" $BACKEND_PROPS ; then
         echo "uv-l-filesToCkan has already been set for backend"
         sed -i "s/dpu.uv-l-filesToCkan.catalog.api.url/org.opendatanode.CKAN.api.url/" $BACKEND_PROPS
         sed -i "s/dpu.uv-l-filesToCkan.secret.token/org.opendatanode.CKAN.secret.token/" $BACKEND_PROPS
         echo "org.opendatanode.CKAN.http.header.X-Forwarded-Host = $HOSTNAME" >> $BACKEND_PROPS
         echo "org.opendatanode.CKAN.http.header.X-Forwarded-Proto = https" >> $BACKEND_PROPS
     
-    if grep -q "org.opendatanode.CKAN.api.url" $BACKEND_PROPS ; then
-        echo "org.opendatanode.CKAN.api.url has been set at backend"
+    if grep -q "org.opendatanode.CKAN" $BACKEND_PROPS ; then
+        echo "org.opendatanode.CKAN.* has been set at backend"
     else
         echo "org.opendatanode.CKAN.secret.token = $TOKEN" >> $BACKEND_PROPS
         echo "org.opendatanode.CKAN.api.url = ${IC_API}" >> $BACKEND_PROPS
@@ -358,24 +358,21 @@ set_unifiedviews() {
     fi 
     
     # remove correct parameter in backend
-    if grep -q "dpu.uv-l-rdfToCkan.catalog.api.url" $BACKEND_PROPS ; then
+    if grep -q "dpu.uv-l-rdfToCkan.catalog" $BACKEND_PROPS ; then
         echo "uv-l-rdfToCkan update config"
-        sed -i "/dpu.uv-l-rdfToCkan.catalog.api.url/d" $BACKEND_PROPS
-        sed -i "/dpu.uv-l-rdfToCkan.secret.token/d" $BACKEND_PROPS
+        sed -i "/dpu.uv-l-rdfToCkan/d" $BACKEND_PROPS
     fi 
     
     # remove correct parameter in backend
-    if grep -q "dpu.uv-l-relationalToCkan.catalog.api.url" $BACKEND_PROPS ; then
+    if grep -q "dpu.uv-l-relationalToCkan" $BACKEND_PROPS ; then
         echo "uv-l-relationalToCkan update config"
-        sed -i "/dpu.uv-l-relationalToCkan.catalog.api.url/d" $BACKEND_PROPS
-        sed -i "/dpu.uv-l-relationalToCkan.secret.token/d" $BACKEND_PROPS
+        sed -i "/dpu.uv-l-relationalToCkan/d" $BACKEND_PROPS
     fi 
     
     # remove correct parameter in backend
-    if grep -q "dpu.uv-l-relationalDiffToCkan.catalog.api.url" $BACKEND_PROPS ; then
+    if grep -q "dpu.uv-l-relationalDiffToCkan" $BACKEND_PROPS ; then
         echo "uv-l-relationalDiffToCkan update config"
-        sed -i "/dpu.uv-l-relationalDiffToCkan.catalog.api.url/d" $BACKEND_PROPS
-        sed -i "/dpu.uv-l-relationalDiffToCkan.secret.token/d" $BACKEND_PROPS
+        sed -i "/dpu.uv-l-relationalDiffToCkan/d" $BACKEND_PROPS
     fi 
  
     unifiedviews_restart

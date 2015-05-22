@@ -440,6 +440,43 @@ set_midpoint() {
   echo "<< set_midpoint"
 }
 
+set_apache() {
+  echo ">> set_apache hostname: $1"
+
+  sed --in-place \
+        -e "s/\$HOSTNAME/$HOSTNAME/" \
+         /etc/odn-simple/odn-simple-apache.conf
+
+  sed --in-place \
+        -e "s/\$HOSTNAME/$HOSTNAME/" \
+         /etc/odn-simple/odn-simple-ssl-apache.conf
+
+  sed --in-place \
+        -e "s/\$HOSTNAME/$HOSTNAME/" \
+        /etc/odn-simple/odn-ckan-ic/apache.conf         
+
+  sed --in-place \
+        -e "s/\$HOSTNAME/$HOSTNAME/" \
+        /etc/odn-simple/odn-ckan-pc/apache.conf 
+        
+  a2dissite default
+  a2ensite odn-simple
+  a2ensite odn-simple-ssl
+  a2ensite odn-ckan-pc
+  a2ensite odn-ckan-ic
+  a2enmod proxy 
+  a2enmod proxy_http
+  a2enmod proxy_connect
+  a2enmod headers
+  a2enmod wsgi
+  a2enmod rewrite	
+  a2enmod ssl proxy_ajp
+  apache_ssl
+  apache_restart    
+         
+ echo "<< set_apache"        
+}
+
 case "$1" in
   configure)
     hostname=$(get_hostname)
@@ -476,20 +513,7 @@ case "$1" in
     run_ckan_internationalization
     fix_perms_cron_job
     # }
-    a2dissite default
-    a2ensite odn-simple
-    a2ensite odn-simple-ssl
-    a2ensite odn-ckan-pc
-    a2ensite odn-ckan-ic
-	a2enmod proxy
-	a2enmod proxy_http
-	a2enmod proxy_connect
-    a2enmod headers
-    a2enmod wsgi
-	a2enmod rewrite	
-    a2enmod ssl proxy_ajp
-    apache_ssl
-    apache_restart
+    set_apache $hostname
     set_virtuoso
     set_unifiedviews $hostname $token
     set_midpoint $hostname

@@ -348,15 +348,6 @@ set_unifiedviews() {
         echo "org.opendatanode.CKAN.http.header.X-Forwarded-Host = $HOSTNAME" >> $BACKEND_PROPS
         echo "org.opendatanode.CKAN.http.header.X-Forwarded-Proto = https" >> $BACKEND_PROPS
     
-    if grep -q "org.opendatanode.CKAN" $BACKEND_PROPS ; then
-        echo "org.opendatanode.CKAN.* has been set at backend"
-    else
-        echo "org.opendatanode.CKAN.secret.token = $TOKEN" >> $BACKEND_PROPS
-        echo "org.opendatanode.CKAN.api.url = ${IC_API}" >> $BACKEND_PROPS
-        echo "org.opendatanode.CKAN.http.header.X-Forwarded-Host = $HOSTNAME" >> $BACKEND_PROPS
-        echo "org.opendatanode.CKAN.http.header.X-Forwarded-Proto = https" >> $BACKEND_PROPS
-    fi 
-    
     # remove correct parameter in backend
     if grep -q "dpu.uv-l-rdfToCkan.catalog" $BACKEND_PROPS ; then
         echo "uv-l-rdfToCkan update config"
@@ -374,7 +365,18 @@ set_unifiedviews() {
         echo "uv-l-relationalDiffToCkan update config"
         sed -i "/dpu.uv-l-relationalDiffToCkan/d" $BACKEND_PROPS
     fi 
- 
+
+    # add configuration of odn uv plugins for ckan integration 
+    if grep -q "org.opendatanode.CKAN" $BACKEND_PROPS ; then
+        echo "org.opendatanode.CKAN has been set at backend"
+    else
+        echo "org.opendatanode.CKAN.secret.token = $TOKEN" >> $BACKEND_PROPS
+        echo "org.opendatanode.CKAN.api.url = ${IC_API}" >> $BACKEND_PROPS
+        echo "org.opendatanode.CKAN.http.header.X-Forwarded-Host = $HOSTNAME" >> $BACKEND_PROPS
+        echo "org.opendatanode.CKAN.http.header.X-Forwarded-Proto = https" >> $BACKEND_PROPS
+    fi 
+
+    
     unifiedviews_restart
     echo "<< set_unifiedviews"
 }

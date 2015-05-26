@@ -347,6 +347,7 @@ set_unifiedviews() {
         sed -i "s/dpu.uv-l-filesToCkan.secret.token/org.opendatanode.CKAN.secret.token/" $BACKEND_PROPS
         echo "org.opendatanode.CKAN.http.header.X-Forwarded-Host = $HOSTNAME" >> $BACKEND_PROPS
         echo "org.opendatanode.CKAN.http.header.X-Forwarded-Proto = https" >> $BACKEND_PROPS
+    fi
     
     # remove correct parameter in backend
     if grep -q "dpu.uv-l-rdfToCkan.catalog" $BACKEND_PROPS ; then

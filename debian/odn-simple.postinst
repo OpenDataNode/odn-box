@@ -82,7 +82,7 @@ add_odn_ckan_pc_user() {
         user_exists=`paster --plugin=ckan user search ${user_name} -c /etc/odn-simple/odn-ckan-pc/production.ini`
         if echo  $user_exists | grep --quiet name=${user_name}; then
             echo "user exists: "$user_name
-            api_key=`paster --plugin=ckan user ${user_name} -c /etc/odn-simple/odn-ckan-pc/production.ini | grep -oP 'apikey=\K\w+-\w+-\w+-\w+'`
+            api_key=`paster --plugin=ckan user ${user_name} -c /etc/odn-simple/odn-ckan-pc/production.ini | grep -oP 'apikey=\K\w+-\w+-\w+-\w+-\w+'`
             # set api key at internal catalog
             sed  --in-place "s/odn.ic2pc.dst.ckan.api.key = .*/odn.ic2pc.dst.ckan.api.key =  $api_key/" /etc/odn-simple/odn-ckan-ic/production.ini             
         else

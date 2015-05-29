@@ -1,4 +1,10 @@
-odn-simple (1.0.2) unstable; urgency=low
+odn-simple (1.0.3) unstable; urgency=low
+
+  * Create release version
+
+ -- jmc <jmc@wheezy.marcek.local>  Fri, 29 May 2015 14:23:48 +0200
+
+odn-simple (1.0.2) stable; urgency=low
 
   * Create release version
 

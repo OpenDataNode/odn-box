@@ -435,7 +435,8 @@ set_midpoint() {
 
 set_apache() {
   echo ">> set_apache hostname: $1"
-
+  HOSTNAME=$1
+  
   sed --in-place \
         -e "s/\$HOSTNAME/$HOSTNAME/" \
          /etc/odn-simple/odn-simple-apache.conf

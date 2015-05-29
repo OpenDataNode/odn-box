@@ -82,6 +82,9 @@ add_odn_ckan_pc_user() {
         user_exists=`paster --plugin=ckan user search ${user_name} -c /etc/odn-simple/odn-ckan-pc/production.ini`
         if echo  $user_exists | grep --quiet name=${user_name}; then
             echo "user exists: "$user_name
+            api_key=`paster --plugin=ckan user ${user_name} -c /etc/odn-simple/odn-ckan-pc/production.ini | grep -oP 'apikey=\K\w+-\w+-\w+-\w+-\w+'`
+            # set api key at internal catalog
+            sed  --in-place "s/odn.ic2pc.dst.ckan.api.key = .*/odn.ic2pc.dst.ckan.api.key =  $api_key/" /etc/odn-simple/odn-ckan-ic/production.ini             
         else
             user_info=`paster --plugin=ckan user add ${user_name} password=admin email=admin@opendata.gov -c /etc/odn-simple/odn-ckan-pc/production.ini`
             echo "user added: "$user_name
@@ -322,9 +325,10 @@ set_unifiedviews() {
     BACKEND_PROPS=/etc/unifiedviews/backend-config.properties
     IC_API=http://localhost:9080/internalcatalog/api/action/internal_api
    
+    sed -i "s/#cas.behindProxy=.*/cas.behindProxy=true/" $FRONTEND_PROPS
     sed -i "s/#logout.url=.*/logout.url=https:\/\/$HOSTNAME\/unifiedviews\/cas_logout/" $FRONTEND_PROPS
     sed -i "s/#cas.server.host=.*/cas.server.host=https:\/\/localhost:38443\/cas/" $FRONTEND_PROPS
-    sed -i "s/#cas.security.check.url=.*/cas.security.check.url=https:\/\/$HOSTNAME\/unifiedviews\/login\/cas/" $FRONTEND_PROPS
+    sed -i "s/#cas.security.check.url=.*/cas.security.check.url=\/unifiedviews\/login\/cas/" $FRONTEND_PROPS
     sed -i "s/#cas.login.url=.*/cas.login.url=https:\/\/$HOSTNAME\/cas\/login/" $FRONTEND_PROPS
     sed -i "s/#cas.logout.url=.*/cas.logout.url=https:\/\/$HOSTNAME\/cas\/logout/" $FRONTEND_PROPS
     
@@ -338,52 +342,47 @@ set_unifiedviews() {
         echo "set orgAttributeName for frontend"
         sed -i "s/\(<b:constructor-arg ref=\"userFacade\" \/>\)/\1   <b:property name=\"orgAttributeName\" value=\"ou\"\/>/" $FRONTEND_PROPS_CAS
     fi
-    
-    
-    # set correct parameter in backend
-    if grep -q "dpu.uv-l-filesToCkan.catalog.api.url" $BACKEND_PROPS ; then
+
+    # remove deprected parameter and correct one in backend
+    if grep -q "dpu.uv-l-filesToCkan" $BACKEND_PROPS ; then
         echo "uv-l-filesToCkan has already been set for backend"
-    else 
-        echo "set uv-l-filesToCkan for backend"
-        echo "dpu.uv-l-filesToCkan.catalog.api.url = ${IC_API}" >> $BACKEND_PROPS
-        echo "dpu.uv-l-filesToCkan.secret.token = ${TOKEN}" >> $BACKEND_PROPS
+        sed -i "s/dpu.uv-l-filesToCkan.catalog.api.url/org.opendatanode.CKAN.api.url/" $BACKEND_PROPS
+        sed -i "s/dpu.uv-l-filesToCkan.secret.token/org.opendatanode.CKAN.secret.token/" $BACKEND_PROPS
+        echo "org.opendatanode.CKAN.http.header.X-Forwarded-Host = $HOSTNAME" >> $BACKEND_PROPS
+        echo "org.opendatanode.CKAN.http.header.X-Forwarded-Proto = https" >> $BACKEND_PROPS
+    fi
+    
+    # remove correct parameter in backend
+    if grep -q "dpu.uv-l-rdfToCkan.catalog" $BACKEND_PROPS ; then
+        echo "uv-l-rdfToCkan update config"
+        sed -i "/dpu.uv-l-rdfToCkan/d" $BACKEND_PROPS
     fi 
     
-    
-    # set correct parameter in backend
-    if grep -q "dpu.uv-l-rdfToCkan.catalog.api.url" $BACKEND_PROPS ; then
-        echo "uv-l-rdfToCkan has already been set for backend"
-    else 
-        echo "set uv-l-rdfToCkan for backend"
-        echo "dpu.uv-l-rdfToCkan.catalog.api.url = ${IC_API}" >> $BACKEND_PROPS
-        echo "dpu.uv-l-rdfToCkan.secret.token = ${TOKEN}" >> $BACKEND_PROPS
+    # remove correct parameter in backend
+    if grep -q "dpu.uv-l-relationalToCkan" $BACKEND_PROPS ; then
+        echo "uv-l-relationalToCkan update config"
+        sed -i "/dpu.uv-l-relationalToCkan/d" $BACKEND_PROPS
     fi 
     
-    
-    # set correct parameter in backend
-    if grep -q "dpu.uv-l-relationalToCkan.catalog.api.url" $BACKEND_PROPS ; then
-        echo "uv-l-relationalToCkan has already been set for backend"
-    else 
-        echo "set uv-l-relationalToCkan for backend"
-        echo "dpu.uv-l-relationalToCkan.catalog.api.url = ${IC_API}" >> $BACKEND_PROPS
-        echo "dpu.uv-l-relationalToCkan.secret.token = ${TOKEN}" >> $BACKEND_PROPS
+    # remove correct parameter in backend
+    if grep -q "dpu.uv-l-relationalDiffToCkan" $BACKEND_PROPS ; then
+        echo "uv-l-relationalDiffToCkan update config"
+        sed -i "/dpu.uv-l-relationalDiffToCkan/d" $BACKEND_PROPS
+    fi 
+
+    # add configuration of odn uv plugins for ckan integration 
+    if grep -q "org.opendatanode.CKAN" $BACKEND_PROPS ; then
+        echo "org.opendatanode.CKAN has been set at backend"
+    else
+        echo "org.opendatanode.CKAN.secret.token = $TOKEN" >> $BACKEND_PROPS
+        echo "org.opendatanode.CKAN.api.url = ${IC_API}" >> $BACKEND_PROPS
+        echo "org.opendatanode.CKAN.http.header.X-Forwarded-Host = $HOSTNAME" >> $BACKEND_PROPS
+        echo "org.opendatanode.CKAN.http.header.X-Forwarded-Proto = https" >> $BACKEND_PROPS
     fi 
 
     
-    # set correct parameter in backend
-    if grep -q "dpu.uv-l-relationalDiffToCkan.catalog.api.url" $BACKEND_PROPS ; then
-        echo "uv-l-relationalDiffToCkan has already been set for backend"
-    else 
-        echo "set uv-l-relationalDiffToCkan for backend"
-        echo "dpu.uv-l-relationalDiffToCkan.catalog.api.url = ${IC_API}" >> $BACKEND_PROPS
-        echo "dpu.uv-l-relationalDiffToCkan.secret.token = ${TOKEN}" >> $BACKEND_PROPS
-    fi 
-    
- 
- 
     unifiedviews_restart
     echo "<< set_unifiedviews"
-
 }
 
 fix_perm() {
@@ -439,6 +438,43 @@ set_midpoint() {
   echo "<< set_midpoint"
 }
 
+set_apache() {
+  echo ">> set_apache hostname: $1"
+
+  sed --in-place \
+        -e "s/\$HOSTNAME/$HOSTNAME/" \
+         /etc/odn-simple/odn-simple-apache.conf
+
+  sed --in-place \
+        -e "s/\$HOSTNAME/$HOSTNAME/" \
+         /etc/odn-simple/odn-simple-ssl-apache.conf
+
+  sed --in-place \
+        -e "s/\$HOSTNAME/$HOSTNAME/" \
+        /etc/odn-simple/odn-ckan-ic/apache.conf         
+
+  sed --in-place \
+        -e "s/\$HOSTNAME/$HOSTNAME/" \
+        /etc/odn-simple/odn-ckan-pc/apache.conf 
+        
+  a2dissite default
+  a2ensite odn-simple
+  a2ensite odn-simple-ssl
+  a2ensite odn-ckan-pc
+  a2ensite odn-ckan-ic
+  a2enmod proxy 
+  a2enmod proxy_http
+  a2enmod proxy_connect
+  a2enmod headers
+  a2enmod wsgi
+  a2enmod rewrite	
+  a2enmod ssl proxy_ajp
+  apache_ssl
+  apache_restart    
+         
+ echo "<< set_apache"        
+}
+
 case "$1" in
   configure)
     hostname=$(get_hostname)
@@ -475,20 +511,7 @@ case "$1" in
     run_ckan_internationalization
     fix_perms_cron_job
     # }
-    a2dissite default
-    a2ensite odn-simple
-    a2ensite odn-simple-ssl
-    a2ensite odn-ckan-pc
-    a2ensite odn-ckan-ic
-	a2enmod proxy
-	a2enmod proxy_http
-	a2enmod proxy_connect
-    a2enmod headers
-    a2enmod wsgi
-	a2enmod rewrite	
-    a2enmod ssl proxy_ajp
-    apache_ssl
-    apache_restart
+    set_apache $hostname
     set_virtuoso
     set_unifiedviews $hostname $token
     set_midpoint $hostname

@@ -463,7 +463,7 @@ set_apache() {
   a2enmod proxy_connect
   a2enmod headers
   a2enmod wsgi
-  a2enmod rewrite	
+  a2enmod rewrite    
   a2enmod ssl proxy_ajp
   apache_ssl
   apache_restart    
@@ -489,7 +489,7 @@ case "$1" in
     wsgi_configure odn-ckan-ic
     pipeline_configure odn-ckan-ic
     ckan_plugin_sync_confgure odn-ckan-ic
-	datastore_readonly_user_set_permission /etc/odn-simple/odn-ckan-ic/production.ini
+    datastore_readonly_user_set_permission /etc/odn-simple/odn-ckan-ic/production.ini
     set_odn_ckan_for_cas odn-ckan-ic $hostname
     configure_filestore odn-ckan-ic
     # }
@@ -497,10 +497,10 @@ case "$1" in
     set_ckans_hostname odn-ckan-pc $hostname
     db_configure odn-ckan-pc odn
     db_configure datastore-odn-pc odn
- 	add_datastore_readonly_user ds_odn_pc odn-pc
+    add_datastore_readonly_user ds_odn_pc odn-pc
     wsgi_configure odn-ckan-pc
     add_odn_ckan_pc_user
-	datastore_readonly_user_set_permission /etc/odn-simple/odn-ckan-pc/production.ini	
+    datastore_readonly_user_set_permission /etc/odn-simple/odn-ckan-pc/production.ini    
     configure_filestore odn-ckan-pc
     #}
     # odn-ckan-ic and odn-ckan-pc {

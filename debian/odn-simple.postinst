@@ -475,9 +475,16 @@ set_apache() {
  echo "<< set_apache"        
 }
 
+solr_admin_restrict() { 
+    iptables -A INPUT -p tcp -s localhost --dport 8983 -j ACCEPT
+    iptables -A INPUT -p tcp --dport 8983 -j DROP
+    iptables-save
+}
+
 case "$1" in
   configure)
     hostname=$(get_hostname)
+    solr_admin_restrict
     invoke-rc.d odn-solr restart
     echo "wait for restart"
     # TODO think about clever waiting

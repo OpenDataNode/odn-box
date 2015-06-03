@@ -1,6 +1,6 @@
 This package provides debian packages for simplified installation of ODN.
 
-For installation manual please see: https://utopia.sk/wiki/display/ODN/Open+Data+Node+v0.11.0
+For installation manual please see: https://utopia.sk/wiki/display/ODN/Open+Data+Node+v1.0.2
 
 
 To add sysadmin user run:

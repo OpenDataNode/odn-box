@@ -230,7 +230,7 @@ set_ckans_api() {
 run_ckan_internationalization() {
    echo ">> run_ckan_internationalization"
     . /usr/share/python/odn-ckan-shared/bin/activate
-    python /etc/odn-simple/odn-ckan-commons/odn_i18n.py
+    python /usr/share/odn-simple/odn-ckan-commons/translate/odn_i18n.py
     deactivate
     echo "<< "
 }
@@ -303,6 +303,12 @@ add_user_system() {
   fix_perm
   
   echo "<< "
+install_theme() {
+    echo ">> install_theme"
+    . /usr/share/python/odn-ckan-shared/bin/activate
+    pip install --upgrade /usr/share/odn-simple/odn-ckan-commons/theme/ckanext-odn-theme.zip
+    deactivate
+    echo "<< "
 }
 
 set_unifiedviews() {
@@ -487,6 +493,9 @@ case "$1" in
     sleep 10
     db_up
     token=$(generate_token)
+    # prerequisites {
+    install_theme
+    #}
     # odn-ckan-ic {
     set_ckans_hostname odn-ckan-ic $hostname
     set_ckans_api $token

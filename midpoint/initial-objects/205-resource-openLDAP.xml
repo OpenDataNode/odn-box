@@ -208,6 +208,18 @@
       </objectType>
    </schemaHandling>
    
+   <capabilities xmlns:cap="http://midpoint.evolveum.com/xml/ns/public/resource/capabilities-3">
+    	<configured>
+            <cap:activation>
+                <cap:status>
+                    <cap:attribute>ri:midPointAccountStatus</cap:attribute>
+                    <cap:enableValue>enabled</cap:enableValue>
+                    <cap:disableValue>disabled</cap:disableValue>
+                </cap:status>
+            </cap:activation>
+    	</configured>
+    </capabilities>
+   
    <synchronization>
       <objectSynchronization>
          <enabled>true</enabled>

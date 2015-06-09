@@ -309,7 +309,7 @@ add_user_system() {
 install_theme() {
     echo ">> install_theme"
     . /usr/share/python/odn-ckan-shared/bin/activate
-    pip install --upgrade /usr/share/odn-simple/odn-ckan-commons/theme/ckanext-odn-theme.zip
+    pip install --upgrade /usr/share/odn-simple/odn-ckan-commons/theme/ckanext-odn-theme.tar.gz
     deactivate
     echo "<< "
 }

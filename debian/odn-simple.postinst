@@ -489,6 +489,10 @@ solr_admin_restrict() {
     iptables-save
 }
 
+set_cas_theme(){
+    cp /var/www/cas/cas.css /usr/share/odn-cas/webapps/cas/css 
+}
+
 case "$1" in
   configure)
     hostname=$(get_hostname)
@@ -533,6 +537,7 @@ case "$1" in
     set_virtuoso
     set_unifiedviews $hostname $token
     set_midpoint $hostname
+    set_cas_theme
   ;;
 
   abort-upgrade|abort-remove|abort-deconfigure)

@@ -303,6 +303,9 @@ add_user_system() {
   fix_perm
   
   echo "<< "
+  
+}
+
 install_theme() {
     echo ">> install_theme"
     . /usr/share/python/odn-ckan-shared/bin/activate
@@ -495,7 +498,7 @@ case "$1" in
     token=$(generate_token)
     # prerequisites {
     install_theme
-    #}
+    #} 
     # odn-ckan-ic {
     set_ckans_hostname odn-ckan-ic $hostname
     set_ckans_api $token

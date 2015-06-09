@@ -115,6 +115,13 @@
 			<ignore>true</ignore>
 		</limitations>
    </item>
+   <item>
+		<ref>c:fullName</ref>
+		<limitations>
+		<layer>PRESENTATION</layer>
+			<ignore>true</ignore>
+		</limitations>
+   </item>
     <item>
 		<ref>c:honorificPrefix</ref>
 		<limitations>

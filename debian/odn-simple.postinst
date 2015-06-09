@@ -403,6 +403,9 @@ set_midpoint() {
   HOSTNAME=$1
   
   # upload initial-objects {
+
+  # value policy
+  curl --user administrator:5ecr3t -H "Content-Type: application/xml" -X PUT http://localhost:18080/midpoint/ws/rest/valuePolicies/00000000-0000-0000-0000-000000000003 -d @/usr/share/odn-midpoint/initial-objects/010-value-policy.xml -v
   # system-configuration
   curl --user administrator:5ecr3t -H "Content-Type: application/xml" -X PUT http://localhost:18080/midpoint/ws/rest/systemConfigurations/00000000-0000-0000-0000-000000000001 -d @/usr/share/odn-midpoint/initial-objects/020-system-configuration.xml -v
   # openLDAP

@@ -56,6 +56,11 @@
          <gen736:principal>cn=idm,ou=Administrators,dc=opendata,dc=org</gen736:principal>
          <gen736:baseContexts>dc=opendata,dc=org</gen736:baseContexts>
          <gen736:host>localhost</gen736:host>
+		 <gen736:accountObjectClasses>inetOrgPerson</gen736:accountObjectClasses>
+         <gen736:accountObjectClasses>midPointPerson</gen736:accountObjectClasses>
+         <gen736:accountObjectClasses>top</gen736:accountObjectClasses>
+         <gen736:accountObjectClasses>person</gen736:accountObjectClasses>
+         <gen736:accountObjectClasses>organizationalPerson</gen736:accountObjectClasses>
          <gen736:groupMemberAttribute>member</gen736:groupMemberAttribute>
          <gen736:passwordHashAlgorithm>SSHA</gen736:passwordHashAlgorithm>
          <gen736:usePagedResultControl>true</gen736:usePagedResultControl>

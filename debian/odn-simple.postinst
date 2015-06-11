@@ -370,12 +370,17 @@ set_unifiedviews() {
     if grep -q "org.opendatanode.CKAN" $BACKEND_PROPS ; then
         echo "org.opendatanode.CKAN has been set at backend"
     else
-        echo "org.opendatanode.CKAN.secret.token = $TOKEN" >> $BACKEND_PROPS
         echo "org.opendatanode.CKAN.api.url = ${IC_API}" >> $BACKEND_PROPS
         echo "org.opendatanode.CKAN.http.header.X-Forwarded-Host = $HOSTNAME" >> $BACKEND_PROPS
         echo "org.opendatanode.CKAN.http.header.X-Forwarded-Proto = https" >> $BACKEND_PROPS
     fi 
-
+ 
+    # set token.
+    if grep -q "org.opendatanode.CKAN.secret.token = *[[:alphanum:]]" $BACKEND_PROPS ; then
+        echo "org.opendatanode.CKAN.secret.token has been set at backend"
+    else 
+        echo "org.opendatanode.CKAN.secret.token = $TOKEN" >> $BACKEND_PROPS  
+    fi
     
     unifiedviews_restart
     echo "<< set_unifiedviews"

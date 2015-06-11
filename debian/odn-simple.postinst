@@ -376,7 +376,7 @@ set_unifiedviews() {
     fi 
  
     # set token.
-    if grep -q "org.opendatanode.CKAN.secret.token = *[[:alphanum:]]" $BACKEND_PROPS ; then
+    if grep -q "org.opendatanode.CKAN.secret.token = *[[:alpha:]]" $BACKEND_PROPS ; then
         echo "org.opendatanode.CKAN.secret.token has been set at backend"
     else 
         echo "org.opendatanode.CKAN.secret.token = $TOKEN" >> $BACKEND_PROPS  

@@ -18,15 +18,17 @@ set -e
 
 
 case "$1" in
-  remove|upgrade|deconfigure)
+  remove|deconfigure)
     # stop odn-midpoint because odn-simple configuration files will be removed
     if [ -x "/etc/init.d/odn-midpoint" ]; then
         invoke-rc.d odn-midpoint stop || true
     fi    
     
     ;;
-
- failed-upgrade)
+  remove)
+  
+    ;;
+  failed-upgrade)
     ;;
 
     *)

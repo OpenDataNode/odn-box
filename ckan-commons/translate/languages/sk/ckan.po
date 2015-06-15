@@ -19,6 +19,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
+#: ckan/templates/package/snippets/additional_info.html:62
+msgid "Last Updated"
+msgstr "Naposledy zmenené"
+
 #: ckan/templates/package/snippets/package_metadata_fields.html:16
 msgid "Author Email"
 msgstr "Email autora"
@@ -70,6 +74,14 @@ msgstr "Preskúmať"
 #: ckan/templates/package/snippets/resource_item.html:36
 msgid "More information"
 msgstr "Viac informácií"
+
+#: ckan/templates/package/snippets/resources_list.html:13
+msgid "Data and Resources"
+msgstr "Dátové zdroje"
+
+#: ckan/templates/package/resource_read.html:69
+msgid "From the dataset abstract"
+msgstr "Abstrakt popisu datasetu"
 
 #: ckan/templates/package/resource_read.html:112
 msgid "There are no views created for this resource yet."

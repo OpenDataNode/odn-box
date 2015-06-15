@@ -1,0 +1,103 @@
+# Slovak translations for ckan.
+# Copyright (C) 2015 ORGANIZATION
+# This file is distributed under the same license as the ckan
+# project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2015.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: ckan 2.3\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2015-06-15 12:01+0200\n"
+"PO-Revision-Date: 2015-02-23 10:46+0100\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: sk <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 0.9.6\n"
+
+#: ckan/templates/package/snippets/package_metadata_fields.html:16
+msgid "Author Email"
+msgstr "Email autora"
+
+#: ckan/templates/package/snippets/package_metadata_fields.html:22
+msgid "Maintainer Email"
+msgstr "Email správcu"
+
+#: ckan/templates/package/snippets/package_form.html:44
+msgid "Next: Add Data"
+msgstr "Ďalšie: Pridať dáta"
+
+#: ckan/templates/macros/form.html:126
+#, python-format
+msgid ""
+"You can use <a href=\"#markdown\" title=\"Markdown quick reference\" data-"
+"target=\"popover\" data-content=\"%(markdown_tooltip)s\" data-html=\"true"
+"\">Markdown formatting</a> here"
+msgstr ""
+"Tu môžete použiť <a href=\"#markdown\" title=\"Markdown quick reference\" "
+"data-target=\"popover\" data-content=\"%(markdown_tooltip)s\" data-html="
+"\"true\">Markdown formátovanie</a>"
+
+#: ckan/templates/package/snippets/resource_form.html:40
+msgid "This will be guessed automatically. Leave blank if you wish"
+msgstr "Bude doplnené automaticky. Môže ostať nevyplnené."
+
+#: ckan/templates/package/snippets/resource_form.html:72
+msgid "Previous"
+msgstr "Späť"
+
+#: ckan/templates/package/snippets/resource_form.html:75
+msgid "Save & add another"
+msgstr "Uložiť a pridať ďalší"
+
+#: ckan/templates/package/search.html:60
+#, python-format
+msgid ""
+" You can also access this registry using the %(api_link)s (see "
+"%(api_doc_link)s). "
+msgstr ""
+" Prístup do tohto zoznamu je možný aj cez %(api_link)s rozhranie (viď. "
+"%(api_doc_link)s). "
+
+#: ckan/templates/package/snippets/resource_item.html:24
+msgid "Explore"
+msgstr "Preskúmať"
+
+#: ckan/templates/package/snippets/resource_item.html:36
+msgid "More information"
+msgstr "Viac informácií"
+
+#: ckan/templates/package/resource_read.html:112
+msgid "There are no views created for this resource yet."
+msgstr "Zatiaľ nebol vytvorený náhľad dát pre tento zdroj dát."
+
+#: ckan/templates/package/resource_read.html:116
+msgid "Not seeing the views you were expecting?"
+msgstr "Nezobrazuje sa náhľad dát dátového zdroja?"
+
+#: ckan/templates/package/snippets/resource_edit_form.html:12
+msgid "Update Resource"
+msgstr "Aktualizuj zdroj"
+
+# resource metadata
+msgid "created"
+msgstr "vytvorené"
+
+msgid "package id"
+msgstr "id datasetu"
+
+msgid "revision id"
+msgstr "id revízie"
+
+msgid "state"
+msgstr "stav"
+
+msgid "has views"
+msgstr "má náhľadov"
+
+msgid "format"
+msgstr "formát"

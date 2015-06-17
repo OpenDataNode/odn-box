@@ -1,0 +1,34 @@
+#! /bin/sh
+# 
+# Abort if any command returns an error value
+set -e
+
+# This script is called before this version of this package is installed.
+# When this script is called, the package's files have not been unpacked
+# yet.
+
+
+case "$1" in
+  install)
+   
+    ;;
+  upgrade)
+    # About to upgrade this package from version $2 TO THIS VERSION.
+    # "prerm upgrade" has already been called for the old version of
+    # this package.
+    if [ -x "/etc/init.d/odn-midpoint" ]; then
+        invoke-rc.d odn-midpoint start || true
+    fi    
+    
+    
+    ;;
+  abort-upgrade)
+    # Back out of an attempt to upgrade this package FROM THIS VERSION to
+    # version $2.  Undo the effects of "postrm upgrade $2".
+
+    ;;
+  *) echo "$0: didn't understand being called with \`$1'" 1>&2
+     exit 1;;
+esac
+
+exit 0

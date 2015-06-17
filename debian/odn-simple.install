@@ -1,6 +1,6 @@
 ckan-ic/* etc/odn-simple/odn-ckan-ic/
 ckan-pc/* etc/odn-simple/odn-ckan-pc/
-ckan-commons/* etc/odn-simple/odn-ckan-commons/
+ckan-commons/* usr/share/odn-simple/odn-ckan-commons/
 solr/* etc/odn-solr/solr/
 publication/sparql/* var/www/sparql/
 publication/dump/* var/www/dump/
@@ -8,3 +8,4 @@ apache/*  etc/odn-simple/
 midpoint/conf/* etc/odn-simple/odn-midpoint/
 midpoint/initial-objects/*  /usr/share/odn-midpoint/initial-objects/
 cron/* /etc/cron.daily/
+cas/css/* var/www/cas/

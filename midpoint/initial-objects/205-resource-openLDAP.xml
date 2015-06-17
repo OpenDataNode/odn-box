@@ -56,6 +56,11 @@
          <gen736:principal>cn=idm,ou=Administrators,dc=opendata,dc=org</gen736:principal>
          <gen736:baseContexts>dc=opendata,dc=org</gen736:baseContexts>
          <gen736:host>localhost</gen736:host>
+		 <gen736:accountObjectClasses>inetOrgPerson</gen736:accountObjectClasses>
+         <gen736:accountObjectClasses>midPointPerson</gen736:accountObjectClasses>
+         <gen736:accountObjectClasses>top</gen736:accountObjectClasses>
+         <gen736:accountObjectClasses>person</gen736:accountObjectClasses>
+         <gen736:accountObjectClasses>organizationalPerson</gen736:accountObjectClasses>
          <gen736:groupMemberAttribute>member</gen736:groupMemberAttribute>
          <gen736:passwordHashAlgorithm>SSHA</gen736:passwordHashAlgorithm>
          <gen736:usePagedResultControl>true</gen736:usePagedResultControl>
@@ -207,6 +212,18 @@
          </credentials>
       </objectType>
    </schemaHandling>
+   
+   <capabilities xmlns:cap="http://midpoint.evolveum.com/xml/ns/public/resource/capabilities-3">
+    	<configured>
+            <cap:activation>
+                <cap:status>
+                    <cap:attribute>ri:midPointAccountStatus</cap:attribute>
+                    <cap:enableValue>enabled</cap:enableValue>
+                    <cap:disableValue>disabled</cap:disableValue>
+                </cap:status>
+            </cap:activation>
+    	</configured>
+    </capabilities>
    
    <synchronization>
       <objectSynchronization>

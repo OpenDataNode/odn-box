@@ -82,22 +82,17 @@ add_odn_ckan_pc_user() {
         user_exists=`paster --plugin=ckan user search ${user_name} -c /etc/odn-simple/odn-ckan-pc/production.ini`
         if echo  $user_exists | grep --quiet name=${user_name}; then
             echo "user exists: "$user_name
-            api_key=`paster --plugin=ckan user ${user_name} -c /etc/odn-simple/odn-ckan-pc/production.ini | grep -oP 'apikey=\K\w+-\w+-\w+-\w+-\w+'`
-            # set api key at internal catalog
-            sed  --in-place "s/odn.ic2pc.dst.ckan.api.key = .*/odn.ic2pc.dst.ckan.api.key =  $api_key/" /etc/odn-simple/odn-ckan-ic/production.ini             
         else
             user_info=`paster --plugin=ckan user add ${user_name} password=admin email=admin@opendata.gov -c /etc/odn-simple/odn-ckan-pc/production.ini`
             echo "user added: "$user_name
-            # parse in python
-            list=`echo $user_info | grep \{.*\} -o` 
-            api_key=`python -c  "d=${list} ; print d['apikey']"`
             paster --plugin=ckan sysadmin  add  ${user_name} -c   /etc/odn-simple/odn-ckan-pc/production.ini  
             echo "set as sysadmin: "$user_name            
-            # set api key at internal catalog
-            sed  --in-place "s/odn.ic2pc.dst.ckan.api.key = .*/odn.ic2pc.dst.ckan.api.key =  $api_key/" /etc/odn-simple/odn-ckan-ic/production.ini 
-            echo "set as api-key "
-            
         fi
+        
+        api_key=`paster --plugin=ckan user ${user_name} -c /etc/odn-simple/odn-ckan-pc/production.ini | grep -oP 'apikey=\K\w+-\w+-\w+-\w+-\w+'`
+        # set api key at internal catalog
+        sed  --in-place "s/odn.ic2pc.dst.ckan.api.key = .*/odn.ic2pc.dst.ckan.api.key =  $api_key/" /etc/odn-simple/odn-ckan-ic/production.ini 
+        echo "set api-key "
        
     deactivate
     echo "<< "
@@ -149,15 +144,6 @@ datastore_readonly_user_set_permission() {
    
    echo "<< "
 }
-
-apache_ssl() {
-    CAS_TOMCAT_JAVA_KEYSTORE=/usr/share/odn-cas/conf/.keystore
-    keytool -importkeystore -srckeystore $CAS_TOMCAT_JAVA_KEYSTORE -destkeystore keystore.p12 -deststoretype PKCS12 -srcstorepass changeit -srcalias tomcat -deststorepass changeit -destkeypass changeit -noprompt
-    openssl pkcs12 -in keystore.p12  -nokeys -out /etc/ssl/certs/odn-cert.pem -passin pass:changeit
-    openssl pkcs12 -in keystore.p12  -nodes -nocerts -out /etc/ssl/private/odn-key.pem -passin pass:changeit
-    rm keystore.p12 || true
-}
-
 
 apache_restart() {
    echo ">> apache_restart"
@@ -222,20 +208,32 @@ generate_token() {
 }
 
 set_ckans_api() {
- echo ">> set_ckan_internal_api: "$1 
-   API_TOKEN=$1
-   
-    sed --in-place \
-        -e "s/\$API_TOKEN/$API_TOKEN/" \
-         /etc/odn-simple/odn-ckan-ic/production.ini
+    echo ">> set_ckan_internal_api: "$1 
+    API_TOKEN=$1
+    BACKEND_PROPS=/etc/unifiedviews/backend-config.properties
+ 
+    # if token was previously set then we use it
+    if grep -q "org.opendatanode.CKAN.secret.token" $BACKEND_PROPS ; then
+      TOKEN_BACKEND=`cat $BACKEND_PROPS | grep -Po  'org.opendatanode.CKAN.secret.token = \K\w+'`
+    fi
 
+    if [ "$TOKEN_BACKEND" != "" ]; then
+        API_TOKEN=$TOKEN_BACKEND
+    fi
+
+     sed --in-place \
+        -e "s/ckan.auth.internal_api.token.*/ckan.auth.internal_api.token = ${API_TOKEN}/" \
+         /etc/odn-simple/odn-ckan-ic/production.ini
+    
+    echo "token: ${API_TOKEN}"
+         
     echo "<< "
 }
 
 run_ckan_internationalization() {
    echo ">> run_ckan_internationalization"
     . /usr/share/python/odn-ckan-shared/bin/activate
-    python /etc/odn-simple/odn-ckan-commons/odn_i18n.py
+    python /usr/share/odn-simple/odn-ckan-commons/translate/odn_i18n.py --translation_file /usr/share/odn-simple/odn-ckan-commons/translate/languages/sk/ckan.po
     deactivate
     echo "<< "
 }
@@ -308,15 +306,25 @@ add_user_system() {
   fix_perm
   
   echo "<< "
+  
 }
+
+install_theme() {
+    echo ">> install_theme"
+    . /usr/share/python/odn-ckan-shared/bin/activate
+    pip install --upgrade /usr/share/odn-simple/odn-ckan-commons/theme/ckanext-odn-theme.tar.gz
+    deactivate
+    echo "<< "
+}
+
 
 set_unifiedviews() {
     echo ">> set_unifiedviews"
 
     UV_DIR=/usr/share/unifiedviews
 
-    mv $UV_DIR/frontend/WEB-INF/web.xml $UV_DIR/frontend/WEB-INF/web_default.xml
-    mv $UV_DIR/frontend/WEB-INF/web_sso.xml $UV_DIR/frontend/WEB-INF/web.xml
+    cp $UV_DIR/frontend/WEB-INF/web.xml $UV_DIR/frontend/WEB-INF/web_default.xml
+    cp $UV_DIR/frontend/WEB-INF/web_sso.xml $UV_DIR/frontend/WEB-INF/web.xml
 
     HOSTNAME=$1
     TOKEN=$2
@@ -380,7 +388,6 @@ set_unifiedviews() {
         echo "org.opendatanode.CKAN.http.header.X-Forwarded-Proto = https" >> $BACKEND_PROPS
     fi 
 
-    
     unifiedviews_restart
     echo "<< set_unifiedviews"
 }
@@ -399,6 +406,9 @@ set_midpoint() {
   HOSTNAME=$1
   
   # upload initial-objects {
+
+  # value policy
+  curl --user administrator:5ecr3t -H "Content-Type: application/xml" -X PUT http://localhost:18080/midpoint/ws/rest/valuePolicies/00000000-0000-0000-0000-000000000003 -d @/usr/share/odn-midpoint/initial-objects/010-value-policy.xml -v
   # system-configuration
   curl --user administrator:5ecr3t -H "Content-Type: application/xml" -X PUT http://localhost:18080/midpoint/ws/rest/systemConfigurations/00000000-0000-0000-0000-000000000001 -d @/usr/share/odn-midpoint/initial-objects/020-system-configuration.xml -v
   # openLDAP
@@ -440,7 +450,8 @@ set_midpoint() {
 
 set_apache() {
   echo ">> set_apache hostname: $1"
-
+  HOSTNAME=$1
+  
   sed --in-place \
         -e "s/\$HOSTNAME/$HOSTNAME/" \
          /etc/odn-simple/odn-simple-apache.conf
@@ -467,23 +478,36 @@ set_apache() {
   a2enmod proxy_connect
   a2enmod headers
   a2enmod wsgi
-  a2enmod rewrite	
+  a2enmod rewrite    
   a2enmod ssl proxy_ajp
-  apache_ssl
   apache_restart    
          
  echo "<< set_apache"        
 }
 
+solr_admin_restrict() { 
+    iptables -A INPUT -p tcp -s localhost --dport 8983 -j ACCEPT
+    iptables -A INPUT -p tcp --dport 8983 -j DROP
+    iptables-save
+}
+
+set_cas_theme(){
+    cp /var/www/cas/cas.css /usr/share/odn-cas/webapps/cas/css 
+}
+
 case "$1" in
   configure)
     hostname=$(get_hostname)
+    solr_admin_restrict
     invoke-rc.d odn-solr restart
     echo "wait for restart"
     # TODO think about clever waiting
     sleep 10
     db_up
     token=$(generate_token)
+    # prerequisites {
+    install_theme
+    #} 
     # odn-ckan-ic {
     set_ckans_hostname odn-ckan-ic $hostname
     set_ckans_api $token
@@ -493,7 +517,7 @@ case "$1" in
     wsgi_configure odn-ckan-ic
     pipeline_configure odn-ckan-ic
     ckan_plugin_sync_confgure odn-ckan-ic
-	datastore_readonly_user_set_permission /etc/odn-simple/odn-ckan-ic/production.ini
+    datastore_readonly_user_set_permission /etc/odn-simple/odn-ckan-ic/production.ini
     set_odn_ckan_for_cas odn-ckan-ic $hostname
     configure_filestore odn-ckan-ic
     # }
@@ -501,10 +525,10 @@ case "$1" in
     set_ckans_hostname odn-ckan-pc $hostname
     db_configure odn-ckan-pc odn
     db_configure datastore-odn-pc odn
- 	add_datastore_readonly_user ds_odn_pc odn-pc
+    add_datastore_readonly_user ds_odn_pc odn-pc
     wsgi_configure odn-ckan-pc
     add_odn_ckan_pc_user
-	datastore_readonly_user_set_permission /etc/odn-simple/odn-ckan-pc/production.ini	
+    datastore_readonly_user_set_permission /etc/odn-simple/odn-ckan-pc/production.ini    
     configure_filestore odn-ckan-pc
     #}
     # odn-ckan-ic and odn-ckan-pc {
@@ -515,6 +539,7 @@ case "$1" in
     set_virtuoso
     set_unifiedviews $hostname $token
     set_midpoint $hostname
+    set_cas_theme
   ;;
 
   abort-upgrade|abort-remove|abort-deconfigure)

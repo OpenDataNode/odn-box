@@ -57,6 +57,10 @@ case "$1" in
         invoke-rc.d apache2 restart || true
     fi
     
+    # del user
+    deluser uploader || true
+    deluser -g uploaders || true
+    
     ;;
  
     purge)

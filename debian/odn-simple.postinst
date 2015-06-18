@@ -389,6 +389,7 @@ set_unifiedviews() {
 fix_perm() {
   echo ">> fix_perm"
   chown uploader:uploaders /var/cache/virtuoso/upload
+  mkdir -p /var/www/dump || true
   chown uploader:uploaders /var/www/dump
   chmod g+sw /var/www/dump
   chmod g+sw /var/cache/virtuoso/upload

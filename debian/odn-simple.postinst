@@ -334,14 +334,6 @@ set_unifiedviews() {
     sh /usr/share/unifiedviews/dist/plugins/deploy-dpus.sh
     sh /usr/share/unifiedviews/dist/odn_plugins/deploy-dpus.sh   
  
-    # set correct attribute in frontend
-    if grep -q "<b:property name=\"orgAttributeName\" value=\"ou\"\/>"  $FRONTEND_PROPS_CAS  ; then
-        echo "orgAttributeName has already been set for frontend"
-    else
-        echo "set orgAttributeName for frontend"
-        sed -i "s/\(<b:constructor-arg ref=\"userFacade\" \/>\)/\1   <b:property name=\"orgAttributeName\" value=\"ou\"\/>/" $FRONTEND_PROPS_CAS
-    fi
-
     # remove deprected parameter and correct one in backend
     if grep -q "dpu.uv-l-filesToCkan" $BACKEND_PROPS ; then
         echo "uv-l-filesToCkan has already been set for backend"

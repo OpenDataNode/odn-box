@@ -124,21 +124,22 @@ http://www.springframework.org/schema/security/spring-security-3.2.xsd">
   </authentication-manager>
 
   <beans:bean id="casAuthenticationProvider"
-      class="org.springframework.security.cas.authentication.CasAuthenticationProvider">
-    <beans:property name="authenticationUserDetailsService">
-      <beans:bean class="org.springframework.security.core.userdetails.UserDetailsByNameServiceWrapper">
-        <beans:constructor-arg ref="userDetailsService" />
-      </beans:bean>
-    </beans:property>
-    <beans:property name="serviceProperties" ref="serviceProperties" />
-    <beans:property name="ticketValidator">
-      <beans:bean class="org.jasig.cas.client.validation.Cas20ServiceTicketValidator">
-        <beans:constructor-arg index="0" value="https://$HOSTNAME/cas" />
-      </beans:bean>
-    </beans:property>
-    <beans:property name="key" value="CAS_ID"/>
+	        class="org.springframework.security.cas.authentication.CasAuthenticationProvider">
+	<beans:property name="authenticationUserDetailsService">
+		<beans:bean class="org.opendatanode.midpoint.security.ODNAuthenticationUserDetailsService">
+			<beans:property name="userDetailsService" ref="userDetailsService"/>
+			<beans:property name="userAttributeName" value="ActorID"/>
+  		</beans:bean>
+	</beans:property>
+	<beans:property name="serviceProperties" ref="serviceProperties" />
+	<beans:property name="ticketValidator">
+		<beans:bean class="org.jasig.cas.client.validation.Cas20ServiceTicketValidator">
+			<beans:constructor-arg index="0" value="https://debian/cas" />
+		</beans:bean>
+	</beans:property>
+	<beans:property name="key" value="CAS_ID"/>
   </beans:bean>
-  
+
 	<!-- For SLO CAS integration uncomment following and set CASSERVER address-->
 	<!-- LOGOUT -->
 	

@@ -134,7 +134,7 @@ http://www.springframework.org/schema/security/spring-security-3.2.xsd">
 	<beans:property name="serviceProperties" ref="serviceProperties" />
 	<beans:property name="ticketValidator">
 		<beans:bean class="org.jasig.cas.client.validation.Cas20ServiceTicketValidator">
-			<beans:constructor-arg index="0" value="https://debian/cas" />
+			<beans:constructor-arg index="0" value="https://$HOSTNAME/cas" />
 		</beans:bean>
 	</beans:property>
 	<beans:property name="key" value="CAS_ID"/>

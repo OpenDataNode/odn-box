@@ -15,8 +15,9 @@
    <fullName>CAS Administrator</fullName>
    <givenName>admin</givenName>
    <familyName>admin</familyName>
+   <organization>comsode</organization>
    <organizationalUnit>comsode</organizationalUnit>
-    <extension >
+    <extension>
       <ext:role>admin</ext:role>
    </extension>
    

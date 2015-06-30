@@ -217,7 +217,7 @@ set_ckans_api() {
  
     # if token was previously set then we use it
     if grep -q "org.opendatanode.CKAN.secret.token" $BACKEND_PROPS ; then
-      TOKEN_BACKEND=`cat $BACKEND_PROPS | grep -Po  'org.opendatanode.CKAN.secret.token = \K\w+'`
+      TOKEN_BACKEND=`cat $BACKEND_PROPS | grep -Po  '^org.opendatanode.CKAN.secret.token = \K\w+'`
     fi
 
     if [ "$TOKEN_BACKEND" != "" ]; then

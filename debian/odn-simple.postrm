@@ -43,7 +43,7 @@ case "$1" in
 
     # reload default odn-simple configuration
     if [ -x "/etc/init.d/odn-midpoint" ]; then
-        invoke-rc.d odn-midpoint start || true
+        invoke-rc.d odn-midpoint restart || true
     fi
 
     # remove apache2 configuration

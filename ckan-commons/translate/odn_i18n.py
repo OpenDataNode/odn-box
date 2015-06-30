@@ -36,9 +36,9 @@ def find_po_files(path, to_merge_localizations):
             localization = create_localization(locale, dir)
 
             if locale in to_merge_localizations:
-                to_merge_localizations[locale] = to_merge_localizations[locale] + localization.po_paths
+                to_merge_localizations[locale] = set(to_merge_localizations[locale]) | set(localization.po_paths)
             else:
-                to_merge_localizations[locale] = localization.po_paths
+                to_merge_localizations[locale] = set(localization.po_paths)
 
 
 def create_localization(locale, parent_dir):

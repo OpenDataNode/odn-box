@@ -211,20 +211,32 @@ generate_token() {
 }
 
 set_ckans_api() {
- echo ">> set_ckan_internal_api: "$1 
-   API_TOKEN=$1
-   
-    sed --in-place \
-        -e "s/\$API_TOKEN/$API_TOKEN/" \
-         /etc/odn-simple/odn-ckan-ic/production.ini
+    echo ">> set_ckan_internal_api: "$1 
+    API_TOKEN=$1
+    BACKEND_PROPS=/etc/unifiedviews/backend-config.properties
+ 
+    # if token was previously set then we use it
+    if grep -q "org.opendatanode.CKAN.secret.token" $BACKEND_PROPS ; then
+      TOKEN_BACKEND=`cat $BACKEND_PROPS | grep -Po  'org.opendatanode.CKAN.secret.token = \K\w+'`
+    fi
 
+    if [ "$TOKEN_BACKEND" != "" ]; then
+        API_TOKEN=$TOKEN_BACKEND
+    fi
+
+     sed --in-place \
+        -e "s/ckan.auth.internal_api.token.*/ckan.auth.internal_api.token = ${API_TOKEN}/" \
+         /etc/odn-simple/odn-ckan-ic/production.ini
+    
+    echo "token: ${API_TOKEN}"
+         
     echo "<< "
 }
 
 run_ckan_internationalization() {
    echo ">> run_ckan_internationalization"
     . /usr/share/python/odn-ckan-shared/bin/activate
-    python /usr/share/odn-simple/odn-ckan-commons/translate/odn_i18n.py
+    python /usr/share/odn-simple/odn-ckan-commons/translate/odn_i18n.py --translation_file /usr/share/odn-simple/odn-ckan-commons/translate/languages/sk/ckan.po
     deactivate
     echo "<< "
 }
@@ -314,8 +326,8 @@ set_unifiedviews() {
 
     UV_DIR=/usr/share/unifiedviews
 
-    mv $UV_DIR/frontend/WEB-INF/web.xml $UV_DIR/frontend/WEB-INF/web_default.xml
-    mv $UV_DIR/frontend/WEB-INF/web_sso.xml $UV_DIR/frontend/WEB-INF/web.xml
+    cp $UV_DIR/frontend/WEB-INF/web.xml $UV_DIR/frontend/WEB-INF/web_default.xml
+    cp $UV_DIR/frontend/WEB-INF/web_sso.xml $UV_DIR/frontend/WEB-INF/web.xml
 
     HOSTNAME=$1
     TOKEN=$2
@@ -365,18 +377,12 @@ set_unifiedviews() {
     if grep -q "org.opendatanode.CKAN" $BACKEND_PROPS ; then
         echo "org.opendatanode.CKAN has been set at backend"
     else
+        echo "org.opendatanode.CKAN.secret.token = $TOKEN" >> $BACKEND_PROPS
         echo "org.opendatanode.CKAN.api.url = ${IC_API}" >> $BACKEND_PROPS
         echo "org.opendatanode.CKAN.http.header.X-Forwarded-Host = $HOSTNAME" >> $BACKEND_PROPS
         echo "org.opendatanode.CKAN.http.header.X-Forwarded-Proto = https" >> $BACKEND_PROPS
     fi 
- 
-    # set token.
-    if grep -q "org.opendatanode.CKAN.secret.token = *[[:alphanum:]]" $BACKEND_PROPS ; then
-        echo "org.opendatanode.CKAN.secret.token has been set at backend"
-    else 
-        echo "org.opendatanode.CKAN.secret.token = $TOKEN" >> $BACKEND_PROPS  
-    fi
-    
+
     unifiedviews_restart
     echo "<< set_unifiedviews"
 }

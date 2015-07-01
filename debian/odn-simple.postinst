@@ -482,9 +482,25 @@ set_apache() {
 }
 
 solr_admin_restrict() { 
-    iptables -A INPUT -p tcp -s localhost --dport 8983 -j ACCEPT
-    iptables -A INPUT -p tcp --dport 8983 -j DROP
-    iptables-save
+    FOUND=0
+    RULE="INPUT -p tcp -s localhost --dport 8983 -j ACCEPT" 
+    iptables -C $RULE
+    status=$?
+       
+    if [ $status != $FOUND ] ; then
+        iptables -A $RULE
+        iptables-save
+    fi
+
+    RULE="INPUT -p tcp --dport 8983 -j DROP" 
+    iptables -C $RULE
+    status=$?
+
+    if [ $status != $FOUND ] ; then
+        iptables -A $RULE
+        iptables-save
+    fi    
+    
 }
 
 set_cas_theme(){

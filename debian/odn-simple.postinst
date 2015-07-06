@@ -482,8 +482,13 @@ set_apache() {
 }
 
 solr_admin_restrict() { 
-    iptables -A INPUT -p tcp -s localhost --dport 8983 -j ACCEPT
-    iptables -A INPUT -p tcp --dport 8983 -j DROP
+    RULE="INPUT -s 127.0.0.1/32 -p tcp -m tcp --dport 8983 -j ACCEPT"
+    iptables -D $RULE > /dev/null 2>&1 || true
+    iptables -A $RULE
+
+    RULE="INPUT -p tcp --dport 8983 -j DROP"
+    iptables -D $RULE > /dev/null 2>&1 || true
+    iptables -A $RULE
     iptables-save
 }
 

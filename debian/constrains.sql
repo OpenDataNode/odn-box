@@ -1,0 +1,4 @@
+ALTER TABLE "ppl_model"
+ADD FOREIGN KEY ("user_id")
+    REFERENCES "usr_user" ("id")
+	ON UPDATE CASCADE ON DELETE CASCADE;

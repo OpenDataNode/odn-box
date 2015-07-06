@@ -483,13 +483,23 @@ set_apache() {
 
 solr_admin_restrict() { 
     RULE="INPUT -s 127.0.0.1/32 -p tcp -m tcp --dport 8983 -j ACCEPT"
-    iptables -D $RULE > /dev/null 2>&1 || true
-    iptables -A $RULE
+    found=false
+    found=`iptables -C $RULE && echo true` || true
+
+    if [ "$found" != "true" ] ; then
+        iptables -A $RULE
+        iptables-save
+    fi
 
     RULE="INPUT -p tcp --dport 8983 -j DROP"
-    iptables -D $RULE > /dev/null 2>&1 || true
-    iptables -A $RULE
-    iptables-save
+    found=false
+    found=`iptables -C $RULE && echo true || true`
+
+    if [ "$found" != "true" ] ; then
+        iptables -A $RULE
+        iptables-save
+    fi
+
 }
 
 set_cas_theme(){

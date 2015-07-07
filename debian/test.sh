@@ -4,14 +4,14 @@ rm data.sql
 
 getNewUserId() {
   oldUserId=$1
-  newUserId=`su - postgres -c  "psql -A -t -d unifiedviews -c \"select usr_user.id  from usr_organization INNER JOIN usr_user ON  usr_organization.organization = usr_user.username INNER JOIN tmp ON  usr_organization.usr = tmp.username where tmp.id = ${oldUserId};
+  newUserId=`su - postgres -c  "psql -A -t -d unifiedviews -c \"select id from usr_user where username = ( select organization  from usr_organization where usr =  ( select username from tmp where id = ${oldUserId}));
 \""`
    echo "$newUserId" 
 }
 
 getNewUserName() {
     oldUserId=$1
-    username=`su - postgres -c  "psql -A -t -d unifiedviews -c \"select usr_user.username from usr_organization INNER JOIN usr_user ON  usr_organization.organization = usr_user.username INNER JOIN tmp ON  usr_organization.usr = tmp.username where tmp.id = ${oldUserId};
+    username=`su - postgres -c  "psql -A -t -d unifiedviews -c \"select username from usr_user where username = ( select organization  from usr_organization where usr =  ( select username from tmp where id = ${oldUserId}));
 \""`
     echo "$username"
 }

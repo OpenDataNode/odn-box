@@ -45,9 +45,15 @@ su - postgres -c "psql  -d ${dbname}" <  update.sql
 su - postgres -c  "psql -A -t -d unifiedviews -c \"select concat('INSERT INTO  \"user_actor\" VALUES (nextval(''seq_usr_user''),''', username,''', ''',full_name,''' );') from usr_user;\"" > user_actors.sql
 su - postgres -c "psql  -d ${dbname}" <  user_actors.sql
 
+echo "disable constrains"
 su - postgres -c  "psql -A -t -d unifiedviews -c \"ALTER TABLE  ppl_model  DROP CONSTRAINT ppl_model_pkey CASCADE\" "
 su - postgres -c  "psql -A -t -d unifiedviews -c \"ALTER TABLE  ppl_model  DROP CONSTRAINT ppl_model_name_key CASCADE;\" "
 su - postgres -c  "psql -A -t -d unifiedviews -c \"ALTER TABLE  ppl_model  DROP CONSTRAINT ppl_model_user_id_fkey  CASCADE;\" "
+su - postgres -c  "psql -A -t -d unifiedviews -c \"ALTER TABLE  usr_extuser  DROP CONSTRAINT usr_extuser_id_usr_fkey CASCADE;\" "
+su - postgres -c  "psql -A -t -d unifiedviews -c \"ALTER TABLE  exec_schedule  DROP CONSTRAINT exec_schedule_user_actor_id_fkey CASCADE;\" "
+su - postgres -c  "psql -A -t -d unifiedviews -c \"ALTER TABLE  exec_schedule  DROP CONSTRAINT exec_schedule_user_id_fkey CASCADE;\" "
+su - postgres -c  "psql -A -t -d unifiedviews -c \"ALTER TABLE  exec_pipeline  DROP CONSTRAINT exec_pipeline_owner_id_fkey CASCADE;\" "
+su - postgres -c  "psql -A -t -d unifiedviews -c \"ALTER TABLE  exec_pipeline  DROP CONSTRAINT exec_pipeline_user_actor_id_fkey CASCADE;\" "
 
 echo "delete old accounts"
 su - postgres -c  "psql -A -t -d unifiedviews -c \"delete from usr_user; \""

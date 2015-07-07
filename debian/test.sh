@@ -24,11 +24,12 @@ getUserActorId() {
 
 su - postgres -c  "psql -A -t -d unifiedviews -c \"delete from  usr_organization;\""
 
-result=`ldapsearch -x -D cn=idm,ou=Administrators,dc=opendata,dc=org  -b  ou=people,dc=opendata,dc=org  -w secret  objectClass=inetOrgPerson |  grep "uid:\|ou:"`
-while read -r org;  read -r user; do
+result=`ldapsearch -x -D cn=idm,ou=Administrators,dc=opendata,dc=org  -b  ou=people,dc=opendata,dc=org  -w secret  objectClass=inetOrgPerson uid | grep "uid:"`
+while read -r user; do
     user=`echo ${user}| grep -oP ": \K.*" `
+    org=`ldapsearch -x -D cn=idm,ou=Administrators,dc=opendata,dc=org  -b  ou=people,dc=opendata,dc=org  -w secret  uid=${user} | grep ou:`
     org=`echo ${org}| grep -oP ": \K.*" `
-
+    
     query="INSERT INTO \"usr_organization\" VALUES (nextval('seq_usr_organization'), '${user}', '${org}');"
     echo $query >> data.sql
 

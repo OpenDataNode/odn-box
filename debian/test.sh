@@ -131,5 +131,6 @@ done <<< "$list"
 echo "delete tmp table"
 su - postgres -c  "psql -A -t -d unifiedviews -c \"drop table IF EXISTS tmp;\""
 # activate constrains
+echo "set constrains back"
 su - postgres -c "psql  -d ${dbname}" <  constrains.sql
 

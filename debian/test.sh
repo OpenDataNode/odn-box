@@ -35,7 +35,6 @@ while read -r user; do
 
 done <<< "$result"
 
-HIGHEST_USER_ID=`su - postgres -c  "psql -A -t -d unifiedviews -c \"select id from usr_user id ORDER BY id DESC limit 1;\""`
 su - postgres -c "psql  -d ${dbname}" <  schema.sql
 su - postgres -c "psql  -d ${dbname}" <  data.sql
 su - postgres -c  "psql -A -t -d unifiedviews -c \"drop table IF EXISTS tmp;\""
@@ -50,6 +49,8 @@ su - postgres -c  "psql -A -t -d unifiedviews -c \"ALTER TABLE  ppl_model  DROP 
 su - postgres -c  "psql -A -t -d unifiedviews -c \"ALTER TABLE  ppl_model  DROP CONSTRAINT ppl_model_name_key CASCADE;\" "
 su - postgres -c  "psql -A -t -d unifiedviews -c \"ALTER TABLE  ppl_model  DROP CONSTRAINT ppl_model_user_id_fkey  CASCADE;\" "
 
+echo "delete old accounts"
+su - postgres -c  "psql -A -t -d unifiedviews -c \"delete from usr_user; \""
 
 
 echo "update ppl_model"
@@ -121,8 +122,6 @@ while read -r user_id; do
 done <<< "$list"
 
 
-echo "delete old accounts"
-su - postgres -c  "psql -A -t -d unifiedviews -c \"delete from usr_user where id <= ${HIGHEST_USER_ID}; \""
 echo "delete tmp table"
 su - postgres -c  "psql -A -t -d unifiedviews -c \"drop table IF EXISTS tmp;\""
 # activate constrains

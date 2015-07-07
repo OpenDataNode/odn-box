@@ -34,7 +34,7 @@ while read -r user; do
     echo $query >> data.sql
 
 done <<< "$result"
-
+# create user_actors from old usr_users
 su - postgres -c  "psql -A -t -d unifiedviews -c \"select concat('INSERT INTO  \"user_actor\" VALUES (nextval(''seq_usr_user''),''', username,''', ''',full_name,''' );') from usr_user;\"" > user_actors.sql
 su - postgres -c "psql  -d ${dbname}" <  user_actors.sql
 
@@ -48,15 +48,15 @@ su - postgres -c  "psql -A -t -d unifiedviews -c \"ALTER TABLE  exec_schedule  D
 su - postgres -c  "psql -A -t -d unifiedviews -c \"ALTER TABLE  exec_pipeline  DROP CONSTRAINT exec_pipeline_owner_id_fkey CASCADE;\" "
 su - postgres -c  "psql -A -t -d unifiedviews -c \"ALTER TABLE  exec_pipeline  DROP CONSTRAINT exec_pipeline_user_actor_id_fkey CASCADE;\" "
 
-
+# create table tmp from usr_user - backup
 su - postgres -c "psql -A -t -d unifiedviews -c \"drop table IF EXISTS tmp;\""
 su - postgres -c "psql -A -t -d unifiedviews -c \"create table tmp as table usr_user;\" "
 echo "delete old accounts"
 su - postgres -c  "psql -A -t -d unifiedviews -c \"delete from usr_user; \""
-
+# create transformation table usr_organization - user-organization
 su - postgres -c "psql  -d ${dbname}" <  schema.sql
 su - postgres -c "psql  -d ${dbname}" <  data.sql
-
+# get a organization name for user and create a user with the organization name
 su - postgres -c "psql -A -t -d unifiedviews -c \"select concat('INSERT INTO  \"usr_user\" VALUES (nextval(''seq_usr_user''),''', organization,''' ,1,''100000:3069f2086098a66ec0a859ec7872b09af7866bc7ecafe2bed3ec394454056db2:b5ab4961ae8ad7775b3b568145060fabb76d7bca41c7b535887201f79ee9788a'',', ' ''', organization,'''',',20);') from usr_organization;\"" > update.sql
 su - postgres -c "psql  -d ${dbname}" <  update.sql
 
@@ -73,7 +73,6 @@ while read -r user_id; do
   
 done <<< "$list"
 
-
 echo "update exec_pipeline"
 list=`su - postgres -c  "psql -A -t -d unifiedviews -c \" select owner_id from exec_pipeline;\""`
 while read -r user_id; do
@@ -86,7 +85,6 @@ while read -r user_id; do
         fi
     fi
 done <<< "$list"
-
 
 echo "update exec_schedule"
 list=`su - postgres -c  "psql -A -t -d unifiedviews -c \" select user_id from exec_schedule;\""`
@@ -102,7 +100,6 @@ while read -r user_id; do
    
 done <<< "$list"
 
-
 echo "update dpu_template"
 list=`su - postgres -c  "psql -A -t -d unifiedviews -c \" select user_id from dpu_template;\""`
 while read -r user_id; do
@@ -116,7 +113,6 @@ while read -r user_id; do
   
 done <<< "$list"
 
-
 echo "update usr_extuser"
 list=`su - postgres -c  "psql -A -t -d unifiedviews -c \" select id_usr from usr_extuser;\""`
 while read -r user_id; do
@@ -127,7 +123,6 @@ while read -r user_id; do
         echo "old id : " $user_id " new id: "$newUserId
     fi
 done <<< "$list"
-
 
 echo "delete tmp table"
 su - postgres -c  "psql -A -t -d unifiedviews -c \"drop table IF EXISTS tmp;\""

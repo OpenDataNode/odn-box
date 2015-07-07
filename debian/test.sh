@@ -51,8 +51,8 @@ su - postgres -c  "psql -A -t -d unifiedviews -c \"ALTER TABLE  exec_pipeline  D
 # create table tmp from usr_user - backup
 su - postgres -c "psql -A -t -d unifiedviews -c \"drop table IF EXISTS tmp;\""
 su - postgres -c "psql -A -t -d unifiedviews -c \"create table tmp as table usr_user;\" "
-echo "delete old accounts"
-su - postgres -c  "psql -A -t -d unifiedviews -c \"delete from usr_user; \""
+echo "delete old accounts except admin, user"
+su - postgres -c  "psql -A -t -d unifiedviews -c \"delete from usr_user where id > 2; \""
 # create transformation table usr_organization - user-organization
 su - postgres -c "psql  -d ${dbname}" <  schema.sql
 su - postgres -c "psql  -d ${dbname}" <  data.sql
@@ -113,14 +113,17 @@ while read -r user_id; do
   
 done <<< "$list"
 
+
+echo "delete old usr_extuser"
+su - postgres -c  "psql -A -t -d unifiedviews -c \"delete from usr_extuser; \""
+
 echo "update usr_extuser"
-list=`su - postgres -c  "psql -A -t -d unifiedviews -c \" select id_usr from usr_extuser;\""`
-while read -r user_id; do
-    newUserId=`getNewUserId  $user_id`
-    if [ ! -z  $newUserId ] ; then
-        username=`getNewUserName $user_id`
-        su - postgres -c  "psql -A -t -d unifiedviews -c \"UPDATE usr_extuser set id_usr = ${newUserId}, id_extuser='${username}' where id_usr = ${user_id};\""
-        echo "old id : " $user_id " new id: "$newUserId
+list=`su - postgres -c  "psql -A -t -d unifiedviews -c \" select id, username from usr_user;\""`
+while read -r line; do
+    if [ ! -z  $line ] ; then
+        id=`echo ${line}|  sed 's/|.*//g' `
+        user_name=`echo ${line}| sed 's/.*|//g'  `
+        su - postgres -c  "psql -A -t -d unifiedviews -c \"INSERT INTO usr_extuser VALUES( ${id} , '${user_name}');\""
     fi
 done <<< "$list"
 

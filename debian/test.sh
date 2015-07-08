@@ -44,9 +44,9 @@ su - postgres -c  "psql -A -t -d unifiedviews -c \"ALTER TABLE  exec_pipeline  D
 # create table tmp from usr_user - backup
 su - postgres -c "psql -A -t -d unifiedviews -c \"drop table IF EXISTS tmp;\""
 su - postgres -c "psql -A -t -d unifiedviews -c \"create table tmp as table usr_user;\" "
-echo "delete old accounts except admin, user"
+echo "delete old accounts except admin, user in usr_user"
 su - postgres -c  "psql -A -t -d unifiedviews -c \"delete from usr_user where id > 2; \""
-# create transformation table usr_organization - user-organization
+# create transformation table usr_organization. Trnasform user to organization
 su - postgres -c "psql  -d ${dbname}" <  schema.sql
 su - postgres -c "psql  -d ${dbname}" <  data.sql
 # get a organization name for user and create a user with the organization name

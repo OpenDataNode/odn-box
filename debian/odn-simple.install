@@ -9,3 +9,4 @@ midpoint/conf/* etc/odn-simple/odn-midpoint/
 midpoint/initial-objects/*  /usr/share/odn-midpoint/initial-objects/
 cron/* /etc/cron.daily/
 cas/css/* var/www/cas/
+upgrade/* usr/share/odn-simple/upgrade/

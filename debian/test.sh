@@ -9,13 +9,6 @@ getNewUserId() {
    echo "$newUserId" 
 }
 
-getNewUserName() {
-    oldUserId=$1
-    username=`su - postgres -c  "psql -A -t -d unifiedviews -c \"select username from usr_user where username = ( select organization  from usr_organization where usr =  ( select username from tmp where id = ${oldUserId}));
-\""`
-    echo "$username"
-}
-
 getUserActorId() {
     userId=$1
     username=`su - postgres -c  "psql -A -t -d unifiedviews -c \"select user_actor.id from usr_extuser INNER JOIN user_actor ON usr_extuser.id_extuser = user_actor.id_extuser  where id_usr= ${userId};\""`

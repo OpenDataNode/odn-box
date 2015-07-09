@@ -482,33 +482,43 @@ set_apache() {
 }
 
 solr_admin_restrict() { 
-    FOUND=0
-    RULE="INPUT -p tcp -s localhost --dport 8983 -j ACCEPT" 
-    iptables -C $RULE
-    status=$?
-       
-    if [ $status != $FOUND ] ; then
+    RULE="INPUT -s 127.0.0.1/32 -p tcp -m tcp --dport 8983 -j ACCEPT"
+    found=false
+    found=`iptables -C $RULE && echo true` || true
+
+    if [ "$found" != "true" ] ; then
         iptables -A $RULE
         iptables-save
     fi
 
-    RULE="INPUT -p tcp --dport 8983 -j DROP" 
-    iptables -C $RULE
-    status=$?
+    RULE="INPUT -p tcp --dport 8983 -j DROP"
+    found=false
+    found=`iptables -C $RULE && echo true || true`
 
-    if [ $status != $FOUND ] ; then
+    if [ "$found" != "true" ] ; then
         iptables -A $RULE
         iptables-save
-    fi    
-    
+    fi
+
 }
 
 set_cas_theme(){
     cp /var/www/cas/cas.css /usr/share/odn-cas/webapps/cas/css 
 }
 
+upgrade() {
+    chmod +x /usr/share/odn-simple/upgrade/1.1.0/migrate.sh
+    /usr/share/odn-simple/upgrade/1.1.0/migrate.sh /usr/share/odn-simple/upgrade/1.1.0/schema.sql /usr/share/odn-simple/upgrade/1.1.0/constrains.sql
+}
+
 case "$1" in
   configure)
+    VERSION=$2
+    if [ "${VERSION}" = "1.0.3" ] ; then
+        upgrade
+    fi
+  
+  
     hostname=$(get_hostname)
     solr_admin_restrict
     invoke-rc.d odn-solr restart

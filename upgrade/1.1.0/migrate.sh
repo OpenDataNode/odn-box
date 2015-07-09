@@ -31,7 +31,7 @@ while read -r user; do
 
 done <<< "$result"
 # create user_actors from old usr_users
-su - postgres -c  "psql -A -t -d ${dbname} -c \"select concat('INSERT INTO  \"user_actor\" VALUES (nextval(''seq_usr_user''),''', username,''', ''',full_name,''' );') from usr_user;\"" > user_actors.sql
+su - postgres -c  "psql -A -t -d ${dbname} -c \"select concat('INSERT INTO  \"user_actor\" VALUES (nextval(''seq_user_actor''),''', username,''', ''',full_name,''' );') from usr_user;\"" > user_actors.sql
 su - postgres -c "psql  -d ${dbname}" <  user_actors.sql
 
 echo "disable constrains"

@@ -18,7 +18,7 @@ getUserActorId() {
     echo "$username"
 }
 
-su - postgres -c  "psql -A -t -d ${dbname} -c \"delete from  usr_organization;\""
+su - postgres -c  "psql -A -t -d ${dbname} -c \"drop table IF EXISTS usr_organization;\""
 
 result=`ldapsearch -x -D cn=idm,ou=Administrators,dc=opendata,dc=org  -b  ou=people,dc=opendata,dc=org  -w secret  objectClass=inetOrgPerson uid | grep "uid:"`
 while read -r user; do

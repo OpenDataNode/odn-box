@@ -45,7 +45,21 @@ case "$1" in
     if [ -x "/etc/init.d/odn-midpoint" ]; then
         invoke-rc.d odn-midpoint restart || true
     fi
+
+    # remove apache2 configuration
+    a2dissite odn-simple || true
+    a2dissite odn-simple-ssl || true
+    a2dissite odn-ckan-pc || true
+    a2dissite odn-ckan-ic || true
+
+    # reload default apache2 configuration
+    if [ -x "/etc/init.d/apache2" ]; then
+        invoke-rc.d apache2 restart || true
+    fi
     
+    # del user
+    deluser uploader || true
+    deluser -g uploaders || true
     
     ;;
  

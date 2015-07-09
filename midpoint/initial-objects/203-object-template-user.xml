@@ -179,6 +179,13 @@
 		</limitations>
    </item>
    <item>
+		<ref>c:organizationalUnit</ref>
+		<limitations>
+			<layer>PRESENTATION</layer>
+			<ignore>true</ignore>
+		</limitations>
+   </item>
+   <item>
 		<ref>c:name</ref>
 		<limitations>
 		<layer>PRESENTATION</layer>

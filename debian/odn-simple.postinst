@@ -160,9 +160,12 @@ apache_restart() {
 
 set_virtuoso() {
    echo ">> set_virtuoso"
-   sed --in-place "s/\(DirsAllowed.*= \., .*\)/\1, \/var\/cache\/virtuoso\/upload/g"  /etc/virtuoso-opensource-7/virtuoso.ini 
-
-    if [ -x "/etc/init.d/virtuoso-opensource-7" ]; then
+   VIRTUOSO_CONFIG=/etc/virtuoso-opensource-7/virtuoso.ini 
+   sed --in-place "s/\(DirsAllowed.*= \., .*\)/\1, \/var\/cache\/virtuoso\/upload/g"  $VIRTUOSO_CONFIG
+   sed --in-place 's/= 8890/= 127.0.0.1:8890/g' $VIRTUOSO_CONFIG
+   sed --in-place 's/= 1111/= 127.0.0.1:1111/g' $VIRTUOSO_CONFIG 
+ 
+     if [ -x "/etc/init.d/virtuoso-opensource-7" ]; then
             if [ -x /usr/sbin/invoke-rc.d ]; then
                     invoke-rc.d virtuoso-opensource-7  restart || true
             else
@@ -214,7 +217,7 @@ set_ckans_api() {
  
     # if token was previously set then we use it
     if grep -q "org.opendatanode.CKAN.secret.token" $BACKEND_PROPS ; then
-      TOKEN_BACKEND=`cat $BACKEND_PROPS | grep -Po  'org.opendatanode.CKAN.secret.token = \K\w+'`
+      TOKEN_BACKEND=`cat $BACKEND_PROPS | grep -Po  '^org.opendatanode.CKAN.secret.token = \K\w+'`
     fi
 
     if [ "$TOKEN_BACKEND" != "" ]; then
@@ -343,14 +346,6 @@ set_unifiedviews() {
     sh /usr/share/unifiedviews/dist/plugins/deploy-dpus.sh
     sh /usr/share/unifiedviews/dist/odn_plugins/deploy-dpus.sh   
  
-    # set correct attribute in frontend
-    if grep -q "<b:property name=\"orgAttributeName\" value=\"ou\"\/>"  $FRONTEND_PROPS_CAS  ; then
-        echo "orgAttributeName has already been set for frontend"
-    else
-        echo "set orgAttributeName for frontend"
-        sed -i "s/\(<b:constructor-arg ref=\"userFacade\" \/>\)/\1   <b:property name=\"orgAttributeName\" value=\"ou\"\/>/" $FRONTEND_PROPS_CAS
-    fi
-
     # remove deprected parameter and correct one in backend
     if grep -q "dpu.uv-l-filesToCkan" $BACKEND_PROPS ; then
         echo "uv-l-filesToCkan has already been set for backend"
@@ -395,6 +390,7 @@ set_unifiedviews() {
 fix_perm() {
   echo ">> fix_perm"
   chown uploader:uploaders /var/cache/virtuoso/upload
+  mkdir -p /var/www/dump || true
   chown uploader:uploaders /var/www/dump
   chmod g+sw /var/www/dump
   chmod g+sw /var/cache/virtuoso/upload
@@ -486,17 +482,43 @@ set_apache() {
 }
 
 solr_admin_restrict() { 
-    iptables -A INPUT -p tcp -s localhost --dport 8983 -j ACCEPT
-    iptables -A INPUT -p tcp --dport 8983 -j DROP
-    iptables-save
+    RULE="INPUT -s 127.0.0.1/32 -p tcp -m tcp --dport 8983 -j ACCEPT"
+    found=false
+    found=`iptables -C $RULE && echo true` || true
+
+    if [ "$found" != "true" ] ; then
+        iptables -A $RULE
+        iptables-save
+    fi
+
+    RULE="INPUT -p tcp --dport 8983 -j DROP"
+    found=false
+    found=`iptables -C $RULE && echo true || true`
+
+    if [ "$found" != "true" ] ; then
+        iptables -A $RULE
+        iptables-save
+    fi
+
 }
 
 set_cas_theme(){
     cp /var/www/cas/cas.css /usr/share/odn-cas/webapps/cas/css 
 }
 
+upgrade() {
+    chmod +x /usr/share/odn-simple/upgrade/1.1.0/migrate.sh
+    /usr/share/odn-simple/upgrade/1.1.0/migrate.sh /usr/share/odn-simple/upgrade/1.1.0/schema.sql /usr/share/odn-simple/upgrade/1.1.0/constrains.sql
+}
+
 case "$1" in
   configure)
+    VERSION=$2
+    if [ "${VERSION}" = "1.0.3" ] ; then
+        upgrade
+    fi
+  
+  
     hostname=$(get_hostname)
     solr_admin_restrict
     invoke-rc.d odn-solr restart

@@ -323,12 +323,7 @@ install_theme() {
 
 set_unifiedviews() {
     echo ">> set_unifiedviews"
-
-    UV_DIR=/usr/share/unifiedviews
-
-    cp $UV_DIR/frontend/WEB-INF/web.xml $UV_DIR/frontend/WEB-INF/web_default.xml
-    cp $UV_DIR/frontend/WEB-INF/web_sso.xml $UV_DIR/frontend/WEB-INF/web.xml
-
+   
     HOSTNAME=$1
     TOKEN=$2
     FRONTEND_PROPS=/etc/unifiedviews/frontend-config.properties
@@ -566,6 +561,13 @@ case "$1" in
 
   abort-upgrade|abort-remove|abort-deconfigure)
   ;;
+  triggered)
+    echo "triggered: change unifiedviews configuration"
+    UV_DIR=/usr/share/unifiedviews
+    cp $UV_DIR/frontend/WEB-INF/web.xml $UV_DIR/frontend/WEB-INF/web_default.xml
+    cp $UV_DIR/frontend/WEB-INF/web_sso.xml $UV_DIR/frontend/WEB-INF/web.xml
+    
+    ;;
 
   *)
     echo "$0 called with unknown argument \`$1'" >&2

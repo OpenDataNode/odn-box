@@ -383,6 +383,9 @@ set_unifiedviews() {
         echo "org.opendatanode.CKAN.http.header.X-Forwarded-Proto = https" >> $BACKEND_PROPS
     fi 
 
+    su - postgres -c "psql  -d unifiedviews" < \
+		/usr/share/unifiedviews/pgsql/data-permissions-odn.sql
+
     unifiedviews_restart
     echo "<< set_unifiedviews"
 }

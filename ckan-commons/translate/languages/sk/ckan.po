@@ -16,7 +16,7 @@ msgstr ""
 "Project-Id-Version: CKAN\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2015-01-26 11:55+0000\n"
-"PO-Revision-Date: 2015-07-27 08:42+0000\n"
+"PO-Revision-Date: 2015-07-27 10:48+0000\n"
 "Last-Translator: Oskar Stoffan <oskar.stoffan@gmail.com>\n"
 "Language-Team: Slovak (http://www.transifex.com/projects/p/ckan/language/sk/)\n"
 "MIME-Version: 1.0\n"
@@ -1793,7 +1793,7 @@ msgstr "Používateľ %s nemá oprávnenie na zobrazenie skupiny %s"
 
 #: ckan/logic/auth/get.py:234
 msgid "You must be logged in to access your dashboard."
-msgstr "Musíte byť prihlásený na prístup k nástenke."
+msgstr "Musíte byť prihlásený na prístup k panelu."
 
 #: ckan/logic/auth/update.py:37
 #, python-format
@@ -2197,9 +2197,9 @@ msgstr "Ukázať profil"
 #, python-format
 msgid "Dashboard (%(num)d new item)"
 msgid_plural "Dashboard (%(num)d new items)"
-msgstr[0] "Zobraziť (%(num)d novú položku)"
-msgstr[1] "Zobraziť (%(num)d nové položky)"
-msgstr[2] "Zobraziť (%(num)d nové položky)"
+msgstr[0] "Panel (%(num)d novú položku)"
+msgstr[1] "Panel (%(num)d nové položky)"
+msgstr[2] "Panel (%(num)d nové položky)"
 
 #: ckan/templates/header.html:33 ckan/templates/user/dashboard.html:16
 msgid "Edit settings"
@@ -2834,9 +2834,9 @@ msgstr "Uložiť skupinu"
 #: ckanext/example_theme/v11_HTML_and_CSS/templates/snippets/example_theme_most_popular_groups.html:22
 msgid "{num} Dataset"
 msgid_plural "{num} Datasets"
-msgstr[0] "{} Dataset"
-msgstr[1] "{} Datasety"
-msgstr[2] "{} Datasetov"
+msgstr[0] "{num} Dataset"
+msgstr[1] "{num} Datasety"
+msgstr[2] "{num} Datasetov"
 
 #: ckan/templates/group/snippets/group_item.html:34
 #: ckan/templates/organization/snippets/organization_item.html:33
@@ -4205,7 +4205,7 @@ msgstr "Hľadať tagy"
 
 #: ckan/templates/user/dashboard.html:6
 msgid "Dashboard"
-msgstr "Nastenka"
+msgstr "Panel"
 
 #: ckan/templates/user/dashboard.html:19 ckan/templates/user/dashboard.html:37
 msgid "News feed"

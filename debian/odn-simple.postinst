@@ -350,13 +350,9 @@ set_unifiedviews() {
     if grep -q "dpu.uv-l-filesToCkan" $BACKEND_PROPS ; then
         echo "uv-l-filesToCkan has already been set for backend"
 		sed -i "s/dpu.uv-l-filesToCkan.catalog.api.url/org.opendatanode.CKAN.api.url/" $BACKEND_PROPS
-		sed -i "s/dpu.uv-l-filesToCkan.catalog.api.url/org.opendatanode.CKAN.api.url/" $FRONTEND_PROPS
 		sed -i "s/dpu.uv-l-filesToCkan.secret.token/org.opendatanode.CKAN.secret.token/" $BACKEND_PROPS
-		sed -i "s/dpu.uv-l-filesToCkan.secret.token/org.opendatanode.CKAN.secret.token/" $FRONTEND_PROPS
 		echo "org.opendatanode.CKAN.http.header.X-Forwarded-Host = $HOSTNAME" >> $BACKEND_PROPS
-		echo "org.opendatanode.CKAN.http.header.X-Forwarded-Host = $HOSTNAME" >> $FRONTEND_PROPS
 		echo "org.opendatanode.CKAN.http.header.X-Forwarded-Proto = https" >> $BACKEND_PROPS
-		echo "org.opendatanode.CKAN.http.header.X-Forwarded-Proto = https" >> $FRONTEND_PROPS
     fi
     
     # remove correct parameter in backend
@@ -382,10 +378,14 @@ set_unifiedviews() {
         echo "org.opendatanode.CKAN has been set at backend"
     else
         echo "org.opendatanode.CKAN.secret.token = $TOKEN" >> $BACKEND_PROPS
-        echo "org.opendatanode.CKAN.api.url = ${IC_API}" >> $BACKEND_PROPS
-        echo "org.opendatanode.CKAN.http.header.X-Forwarded-Host = $HOSTNAME" >> $BACKEND_PROPS
-        echo "org.opendatanode.CKAN.http.header.X-Forwarded-Proto = https" >> $BACKEND_PROPS
-    fi 
+ 		echo "org.opendatanode.CKAN.secret.token = $TOKEN" >> $FRONTEND_PROPS
+		echo "org.opendatanode.CKAN.api.url = ${IC_API}" >> $BACKEND_PROPS
+		echo "org.opendatanode.CKAN.api.url = ${IC_API}" >> $FRONTEND_PROPS
+		echo "org.opendatanode.CKAN.http.header.X-Forwarded-Host = $HOSTNAME" >> $BACKEND_PROPS
+		echo "org.opendatanode.CKAN.http.header.X-Forwarded-Host = $HOSTNAME" >> $FRONTEND_PROPS
+		echo "org.opendatanode.CKAN.http.header.X-Forwarded-Proto = https" >> $BACKEND_PROPS
+		echo "org.opendatanode.CKAN.http.header.X-Forwarded-Proto = https" >> $FRONTEND_PROPS
+	fi 
 
     su - postgres -c "psql  -d unifiedviews" < \
 		/usr/share/unifiedviews/pgsql/data-permissions-odn.sql

@@ -8,18 +8,17 @@
      xmlns:c="http://midpoint.evolveum.com/xml/ns/public/common/common-3"
      xmlns:q="http://prism.evolveum.com/xml/ns/public/query-3"
      xmlns:ri="http://midpoint.evolveum.com/xml/ns/public/resource/instance-3"
-     oid="33a16020-f48a-4343-b2c8-e70290fcf476"
+     oid="b98892c3-f2e9-45bb-82be-125e0946ea5e"
      version="0">
-   <name>comsode</name>
-   <description>comsode</description>
-   <parentOrgRef oid="b98892c3-f2e9-45bb-82be-125e0946ea5e" type="c:OrgType"><!-- root --></parentOrgRef>
+   <name>root</name>
+   <description>Root hierarchy</description>
    <activation>
       <administrativeStatus>enabled</administrativeStatus>
       <effectiveStatus>enabled</effectiveStatus>
    </activation>
    <iteration>0</iteration>
    <iterationToken/>
-   <displayName>comsode</displayName>
+   <displayName>root</displayName>
    <requestable>false</requestable>
    <tenant>false</tenant>
 </org>

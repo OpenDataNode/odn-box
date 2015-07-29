@@ -422,6 +422,10 @@ set_midpoint() {
   curl --user administrator:5ecr3t -H "Content-Type: application/xml" -X PUT http://localhost:18080/midpoint/ws/rest/roles/11111111-0000-0000-0000-000000000004 -d @/usr/share/odn-midpoint/initial-objects/202-role-user.xml -v
   # template user
   curl --user administrator:5ecr3t -H "Content-Type: application/xml" -X PUT http://localhost:18080/midpoint/ws/rest/objectTemplates/10000000-0000-0000-0000-000000000222 -d @/usr/share/odn-midpoint/initial-objects/203-object-template-user.xml -v
+    # organization root 
+  curl --user administrator:5ecr3t -H "Content-Type: application/xml" -X PUT http://localhost:18080/midpoint/ws/rest/orgs/b98892c3-f2e9-45bb-82be-125e0946ea5e -d @/usr/share/odn-midpoint/initial-objects/200-organization-root.xml -v
+    # organization comsode 
+  curl --user administrator:5ecr3t -H "Content-Type: application/xml" -X PUT http://localhost:18080/midpoint/ws/rest/orgs/33a16020-f48a-4343-b2c8-e70290fcf476 -d @/usr/share/odn-midpoint/initial-objects/200-organization-comsode.xml -v
   # user cas admin
   curl --user administrator:5ecr3t -H "Content-Type: application/xml" -X PUT http://localhost:18080/midpoint/ws/rest/users/11111111-0000-0000-0000-000000000001 -d @/usr/share/odn-midpoint/initial-objects/205-user-cas-admin.xml -v
   #}

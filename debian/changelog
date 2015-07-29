@@ -2,7 +2,7 @@ odn-simple (1.1.1) stable; urgency=low
 
   * Added small fixes in midpoint
   * upgrade of unifiedviews
-  *
+  * improved ckan translations
 
  -- Jan Marcek <jan.marcek@eea.sk>  Wed, 29 Jul 2015 16:18:27 +0200
 

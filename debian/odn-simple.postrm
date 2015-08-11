@@ -60,7 +60,16 @@ case "$1" in
     # del user
     deluser uploader || true
     deluser -g uploaders || true
+   
+    # drop database of odn-ckan-ic
+    echo "DROP DATABASE odn-ckan-ic"
+    su - postgres -c "dropdb odn-ckan-ic" || true
+    su - postgres -c "dropdb datastore-odn-ic" || true
     
+    # drop database of odn-ckan-pc
+    echo "DROP DATABASE odn-ckan-pc"
+    su - postgres -c "dropdb odn-ckan-pc" || true
+    su - postgres -c "dropdb datastore-odn-pc" || true
     ;;
  
     purge)

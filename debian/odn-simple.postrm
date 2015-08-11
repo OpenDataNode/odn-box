@@ -63,11 +63,13 @@ case "$1" in
    
     # drop database of odn-ckan-ic
     echo "DROP DATABASE odn-ckan-ic"
+    /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckan db clean -c /etc/odn-simple/odn-ckan-ic/production.ini
     su - postgres -c "dropdb odn-ckan-ic" || true
     su - postgres -c "dropdb datastore-odn-ic" || true
     
     # drop database of odn-ckan-pc
     echo "DROP DATABASE odn-ckan-pc"
+    /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckan db clean -c /etc/odn-simple/odn-ckan-pc/production.ini
     su - postgres -c "dropdb odn-ckan-pc" || true
     su - postgres -c "dropdb datastore-odn-pc" || true
     ;;

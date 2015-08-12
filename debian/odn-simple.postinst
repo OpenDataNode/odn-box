@@ -323,7 +323,6 @@ install_theme() {
 
 set_unifiedviews() {
     echo ">> set_unifiedviews"
-   
     HOSTNAME=$1
     TOKEN=$2
     FRONTEND_PROPS=/etc/unifiedviews/frontend-config.properties
@@ -331,6 +330,7 @@ set_unifiedviews() {
     BACKEND_PROPS=/etc/unifiedviews/backend-config.properties
     IC_API=http://localhost:9080/internalcatalog/api/action/internal_api
    
+    activate_unifiedviews_sso
     sed -i "s/#cas.behindProxy=.*/cas.behindProxy=true/" $FRONTEND_PROPS
     sed -i "s/#logout.url=.*/logout.url=https:\/\/$HOSTNAME\/unifiedviews\/cas_logout/" $FRONTEND_PROPS
     sed -i "s/#cas.server.host=.*/cas.server.host=https:\/\/localhost:38443\/cas/" $FRONTEND_PROPS
@@ -517,6 +517,14 @@ upgrade() {
     /usr/share/odn-simple/upgrade/1.1.0/migrate.sh /usr/share/odn-simple/upgrade/1.1.0/schema.sql /usr/share/odn-simple/upgrade/1.1.0/constrains.sql
 }
 
+activate_unifiedviews_sso() {
+   echo ">> activate_unifiedviews_sso"
+   UV_DIR=/usr/share/unifiedviews
+   cp $UV_DIR/frontend/WEB-INF/web.xml $UV_DIR/frontend/WEB-INF/web_default.xml
+   cp $UV_DIR/frontend/WEB-INF/web_sso.xml $UV_DIR/frontend/WEB-INF/web.xml
+   echo "<< activate_unifiedviews_sso"
+}
+
 case "$1" in
   configure)
     VERSION=$2
@@ -574,9 +582,7 @@ case "$1" in
   ;;
   triggered)
     echo "triggered: change unifiedviews configuration"
-    UV_DIR=/usr/share/unifiedviews
-    cp $UV_DIR/frontend/WEB-INF/web.xml $UV_DIR/frontend/WEB-INF/web_default.xml
-    cp $UV_DIR/frontend/WEB-INF/web_sso.xml $UV_DIR/frontend/WEB-INF/web.xml
+    activate_unifiedviews_sso
     
     ;;
 

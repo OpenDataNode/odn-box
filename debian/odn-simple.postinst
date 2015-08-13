@@ -528,10 +528,12 @@ activate_unifiedviews_sso() {
 case "$1" in
   configure)
     VERSION=$2
-    if [ "${VERSION}" = "1.0.3" ] ; then
+    UPGRADE="upgrade"
+    # upgrade has to be done for all <= 1.0.3 
+    ret=`dpkg --compare-versions $VERSION le 1.0.3  > /dev/null 2>&1 && echo $UPGRADE` || true 
+    if [ "$ret" = "$UPGRADE" ] ; then
         upgrade
     fi
-  
   
     hostname=$(get_hostname)
     solr_admin_restrict

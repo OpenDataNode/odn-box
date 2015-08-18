@@ -66,6 +66,23 @@
             <filter class="solr.LowerCaseFilterFactory"/>
         </analyzer>
     </fieldType>
+  
+    <fieldType name="alphaOnlySort" class="solr.TextField" sortMissingLast="true" omitNorms="true">
+        <analyzer>
+            <!-- KeywordTokenizer does no actual tokenizing, so the entire
+                 input string is preserved as a single token
+              -->
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+            <!-- The LowerCase TokenFilter does what you expect, which can be
+                 when you want your sorting to be case insensitive
+              -->
+            <filter class="solr.LowerCaseFilterFactory" />
+            <!-- The TrimFilter removes any leading or trailing whitespace -->
+            <filter class="solr.TrimFilterFactory" />
+            <!-- remove non asci characters - workaround how to handle diacritics -->
+            <filter class="solr.ASCIIFoldingFilterFactory" preserveOriginal="false"/>
+        </analyzer>
+    </fieldType>
 </types>
 
 
@@ -126,10 +143,8 @@
 
     <field name="indexed_ts" type="date" indexed="true" stored="true" default="NOW" multiValued="false"/>
 
-    <!-- Copy the title field into titleString, and treat as a string
-         (rather than text type).  This allows us to sort on the titleString -->
-    <!-- field name="title_string" type="string" indexed="true" stored="false" / -->
-    <field name="title_string" type="text" indexed="true" stored="false" />
+    <!-- Copy the title field into titleString, and treat as a special text -->
+    <field name="title_string" type="alphaOnlySort" indexed="true" stored="false"  multiValued="false" />
 
     <field name="data_dict" type="string" indexed="false" stored="true" />
     <field name="validated_data_dict" type="string" indexed="false" stored="true" />
@@ -142,7 +157,7 @@
     <dynamicField name="res_extras_*" type="text" indexed="true" stored="true" multiValued="true"/>
     <dynamicField name="vocab_*" type="string" indexed="true" stored="true" multiValued="true"/>
     <dynamicField name="*" type="string" indexed="true"  stored="false"/>
-</fields>
+</fields> 
 
 <uniqueKey>index_id</uniqueKey>
 <defaultSearchField>text</defaultSearchField>

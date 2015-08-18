@@ -1,3 +1,9 @@
+odn-simple (1.1.2) stable; urgency=low
+
+  * Release version
+
+ -- Jan Marcek <jan.marcek@eea.sk>  Wed, 12 Aug 2015 16:18:27 +0200
+
 odn-simple (1.1.1) stable; urgency=low
 
   * Added small fixes in midpoint

@@ -546,7 +546,6 @@ case "$1" in
     hostname=$(get_hostname)
     solr_admin_restrict
     invoke-rc.d odn-solr restart
-    solr_reindex
     echo "wait for restart"
     # TODO think about clever waiting
     sleep 10
@@ -581,6 +580,7 @@ case "$1" in
     # odn-ckan-ic and odn-ckan-pc {
     run_ckan_internationalization
     fix_perms_cron_job
+    solr_reindex
     # }
     set_apache $hostname
     set_virtuoso

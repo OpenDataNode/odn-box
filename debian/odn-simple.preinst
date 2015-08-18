@@ -19,7 +19,9 @@ case "$1" in
     if [ -x "/etc/init.d/odn-midpoint" ]; then
         invoke-rc.d odn-midpoint start || true
     fi    
-    
+    # reindex solr 
+    /usr/share/python/odn-ckan-shared/bin/paster  --plugin=ckan search-index rebuild -r -c /etc/odn-simple/odn-ckan-ic/production.ini
+    /usr/share/python/odn-ckan-shared/bin/paster  --plugin=ckan search-index rebuild -r -c /etc/odn-simple/odn-ckan-pc/production.ini
     
     ;;
   abort-upgrade)

@@ -544,9 +544,9 @@ case "$1" in
     fi
   
     hostname=$(get_hostname)
-    solr_reindex
     solr_admin_restrict
     invoke-rc.d odn-solr restart
+    solr_reindex
     echo "wait for restart"
     # TODO think about clever waiting
     sleep 10

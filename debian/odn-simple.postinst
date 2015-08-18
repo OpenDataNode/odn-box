@@ -508,6 +508,14 @@ solr_admin_restrict() {
 
 }
 
+solr_reindex() {
+   echo ">> solr_reindex"
+   /usr/share/python/odn-ckan-shared/bin/paster  --plugin=ckan search-index rebuild -r -c /etc/odn-simple/odn-ckan-ic/production.ini
+   /usr/share/python/odn-ckan-shared/bin/paster  --plugin=ckan search-index rebuild -r -c /etc/odn-simple/odn-ckan-pc/production.ini
+   echo "<< solr_reindex"
+}
+
+
 set_cas_theme(){
     cp /var/www/cas/cas.css /usr/share/odn-cas/webapps/cas/css 
 }
@@ -536,6 +544,7 @@ case "$1" in
     fi
   
     hostname=$(get_hostname)
+    solr_reindex
     solr_admin_restrict
     invoke-rc.d odn-solr restart
     echo "wait for restart"

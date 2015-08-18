@@ -20,6 +20,9 @@ case "$1" in
         invoke-rc.d odn-midpoint start || true
     fi    
     # reindex solr 
+    if [ -x "/etc/init.d/odn-solr" ]; then
+        invoke-rc.d odn-solr restart || true
+    fi    
     /usr/share/python/odn-ckan-shared/bin/paster  --plugin=ckan search-index rebuild -r -c /etc/odn-simple/odn-ckan-ic/production.ini
     /usr/share/python/odn-ckan-shared/bin/paster  --plugin=ckan search-index rebuild -r -c /etc/odn-simple/odn-ckan-pc/production.ini
     

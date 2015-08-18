@@ -237,6 +237,7 @@ run_ckan_internationalization() {
    echo ">> run_ckan_internationalization"
     . /usr/share/python/odn-ckan-shared/bin/activate
     python /usr/share/odn-simple/odn-ckan-commons/translate/odn_i18n.py --translation_file /usr/share/odn-simple/odn-ckan-commons/translate/languages/sk/ckan.po
+    python /usr/share/odn-simple/odn-ckan-commons/translate/odn_i18n.py --translation_file /usr/share/odn-simple/odn-ckan-commons/translate/languages/sk/additional_translations.po
     deactivate
     echo "<< "
 }
@@ -323,12 +324,6 @@ install_theme() {
 
 set_unifiedviews() {
     echo ">> set_unifiedviews"
-
-    UV_DIR=/usr/share/unifiedviews
-
-    cp $UV_DIR/frontend/WEB-INF/web.xml $UV_DIR/frontend/WEB-INF/web_default.xml
-    cp $UV_DIR/frontend/WEB-INF/web_sso.xml $UV_DIR/frontend/WEB-INF/web.xml
-
     HOSTNAME=$1
     TOKEN=$2
     FRONTEND_PROPS=/etc/unifiedviews/frontend-config.properties
@@ -336,6 +331,7 @@ set_unifiedviews() {
     BACKEND_PROPS=/etc/unifiedviews/backend-config.properties
     IC_API=http://localhost:9080/internalcatalog/api/action/internal_api
    
+    activate_unifiedviews_sso
     sed -i "s/#cas.behindProxy=.*/cas.behindProxy=true/" $FRONTEND_PROPS
     sed -i "s/#logout.url=.*/logout.url=https:\/\/$HOSTNAME\/unifiedviews\/cas_logout/" $FRONTEND_PROPS
     sed -i "s/#cas.server.host=.*/cas.server.host=https:\/\/localhost:38443\/cas/" $FRONTEND_PROPS
@@ -513,6 +509,14 @@ solr_admin_restrict() {
 
 }
 
+solr_reindex() {
+   echo ">> solr_reindex"
+   /usr/share/python/odn-ckan-shared/bin/paster  --plugin=ckan search-index rebuild -r -c /etc/odn-simple/odn-ckan-ic/production.ini
+   /usr/share/python/odn-ckan-shared/bin/paster  --plugin=ckan search-index rebuild -r -c /etc/odn-simple/odn-ckan-pc/production.ini
+   echo "<< solr_reindex"
+}
+
+
 set_cas_theme(){
     cp /var/www/cas/cas.css /usr/share/odn-cas/webapps/cas/css 
 }
@@ -522,13 +526,23 @@ upgrade() {
     /usr/share/odn-simple/upgrade/1.1.0/migrate.sh /usr/share/odn-simple/upgrade/1.1.0/schema.sql /usr/share/odn-simple/upgrade/1.1.0/constrains.sql
 }
 
+activate_unifiedviews_sso() {
+   echo ">> activate_unifiedviews_sso"
+   UV_DIR=/usr/share/unifiedviews
+   cp $UV_DIR/frontend/WEB-INF/web.xml $UV_DIR/frontend/WEB-INF/web_default.xml
+   cp $UV_DIR/frontend/WEB-INF/web_sso.xml $UV_DIR/frontend/WEB-INF/web.xml
+   echo "<< activate_unifiedviews_sso"
+}
+
 case "$1" in
   configure)
     VERSION=$2
-    if [ "${VERSION}" = "1.0.3" ] ; then
+    UPGRADE="upgrade"
+    # upgrade has to be done for all <= 1.0.3 
+    ret=`dpkg --compare-versions $VERSION le 1.0.3  > /dev/null 2>&1 && echo $UPGRADE` || true 
+    if [ "$ret" = "$UPGRADE" ] ; then
         upgrade
     fi
-  
   
     hostname=$(get_hostname)
     solr_admin_restrict
@@ -567,6 +581,7 @@ case "$1" in
     # odn-ckan-ic and odn-ckan-pc {
     run_ckan_internationalization
     fix_perms_cron_job
+    solr_reindex
     # }
     set_apache $hostname
     set_virtuoso
@@ -577,6 +592,11 @@ case "$1" in
 
   abort-upgrade|abort-remove|abort-deconfigure)
   ;;
+  triggered)
+    echo "triggered: change unifiedviews configuration"
+    activate_unifiedviews_sso
+    
+    ;;
 
   *)
     echo "$0 called with unknown argument \`$1'" >&2

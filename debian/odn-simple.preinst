@@ -20,7 +20,6 @@ case "$1" in
         invoke-rc.d odn-midpoint start || true
     fi    
     
-    
     ;;
   abort-upgrade)
     # Back out of an attempt to upgrade this package FROM THIS VERSION to

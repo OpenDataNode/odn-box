@@ -207,7 +207,7 @@ set_ckans_hostname() {
 }
 
 generate_token() {
-    cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w ${1:-32} | head -n 1
+    head -c16 /dev/urandom | md5sum |  awk '{ print $1 }'
 }
 
 set_ckans_api() {

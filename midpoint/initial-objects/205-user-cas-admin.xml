@@ -5,12 +5,12 @@
       <targetRef oid="00000000-0000-0000-0000-000000000004" type="RoleType"/>
    	</assignment>
    	<assignment id="1">
-      <targetRef xmlns:c="http://midpoint.evolveum.com/xml/ns/public/common/common-3"
+      <targetRef
                  oid="11111111-0000-0000-0000-000000000003"
-                 type="c:RoleType"/>
+                 type="RoleType"/>
    	</assignment>
  	<assignment id="3">
-		<targetRef oid="33a16020-f48a-4343-b2c8-e70290fcf476" type="c:OrgType"/>
+		<targetRef oid="33a16020-f48a-4343-b2c8-e70290fcf476" type="OrgType"/>
 	</assignment>
    <activation>
       <administrativeStatus>enabled</administrativeStatus>

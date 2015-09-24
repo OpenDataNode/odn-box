@@ -148,7 +148,6 @@ datastore_readonly_user_set_permission() {
 
 ckan_plugin_sync_migrate() {
   site=$1
-  version=$2
   echo -n "INFO: Migrate ckanext-odn-ic2pc-sync"
   /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckanext-odn-ic2pc-sync odn_ic2pc_sync_cmd migrate_to_v0.6.0 --config=/etc/odn-simple/${site}/production.ini   
  
@@ -326,6 +325,8 @@ install_theme() {
     echo ">> install_theme"
     . /usr/share/python/odn-ckan-shared/bin/activate
     pip install --upgrade /usr/share/odn-simple/odn-ckan-commons/theme/ckanext-odn-theme.tar.gz
+    apache_restart
+    sleep 2
     deactivate
     echo "<< "
 }
@@ -567,7 +568,7 @@ case "$1" in
     install_theme
     ret=`dpkg --compare-versions $VERSION lt 1.2.0  > /dev/null 2>&1 && echo $UPGRADE` || true 
     if [ "$ret" = "$UPGRADE" ] ; then
-        ckan_plugin_sync_migrate odn-ckan-ic $2 
+         ckan_plugin_sync_migrate odn-ckan-ic
     fi    
     #} 
     # odn-ckan-ic {

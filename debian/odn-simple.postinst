@@ -145,6 +145,15 @@ datastore_readonly_user_set_permission() {
    echo "<< "
 }
 
+
+ckan_plugin_sync_migrate() {
+  site=$1
+  version=$2
+  echo -n "INFO: Migrate ckanext-odn-ic2pc-sync"
+  /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckanext-odn-ic2pc-sync odn_ic2pc_sync_cmd migrate_to_v0.6.0 --config=/etc/odn-simple/${site}/production.ini   
+ 
+ }
+
 apache_restart() {
    echo ">> apache_restart"
 
@@ -545,6 +554,11 @@ case "$1" in
     if [ "$ret" = "$UPGRADE" ] ; then
         upgrade
     fi
+    
+    ret=`dpkg --compare-versions $VERSION lt 1.2.0  > /dev/null 2>&1 && echo $UPGRADE` || true 
+    if [ "$ret" = "$UPGRADE" ] ; then
+        ckan_plugin_sync_migrate odn-ckan-ic $2 
+    fi    
   
     hostname=$(get_hostname)
     solr_admin_restrict

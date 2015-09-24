@@ -555,11 +555,6 @@ case "$1" in
         upgrade
     fi
     
-    ret=`dpkg --compare-versions $VERSION lt 1.2.0  > /dev/null 2>&1 && echo $UPGRADE` || true 
-    if [ "$ret" = "$UPGRADE" ] ; then
-        ckan_plugin_sync_migrate odn-ckan-ic $2 
-    fi    
-  
     hostname=$(get_hostname)
     solr_admin_restrict
     invoke-rc.d odn-solr restart
@@ -570,6 +565,10 @@ case "$1" in
     token=$(generate_token)
     # prerequisites {
     install_theme
+    ret=`dpkg --compare-versions $VERSION lt 1.2.0  > /dev/null 2>&1 && echo $UPGRADE` || true 
+    if [ "$ret" = "$UPGRADE" ] ; then
+        ckan_plugin_sync_migrate odn-ckan-ic $2 
+    fi    
     #} 
     # odn-ckan-ic {
     set_ckans_hostname odn-ckan-ic $hostname

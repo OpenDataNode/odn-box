@@ -145,6 +145,15 @@ datastore_readonly_user_set_permission() {
    echo "<< "
 }
 
+
+ckan_plugin_sync_migrate() {
+  echo ">> ckan_plugin_sync_migrate: $1"
+  site=$1
+  echo -n "INFO: Migrate ckanext-odn-ic2pc-sync"
+  /usr/share/python/odn-ckan-shared/bin/paster --plugin=ckanext-odn-ic2pc-sync odn_ic2pc_sync_cmd migrate_to_v0.6.0 --config=/etc/odn-simple/${site}/production.ini   
+  echo "<< "
+ }
+
 apache_restart() {
    echo ">> apache_restart"
 
@@ -207,7 +216,7 @@ set_ckans_hostname() {
 }
 
 generate_token() {
-    cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w ${1:-32} | head -n 1
+    head -c16 /dev/urandom | md5sum |  awk '{ print $1 }'
 }
 
 set_ckans_api() {
@@ -316,7 +325,9 @@ add_user_system() {
 install_theme() {
     echo ">> install_theme"
     . /usr/share/python/odn-ckan-shared/bin/activate
-    pip install --upgrade /usr/share/odn-simple/odn-ckan-commons/theme/ckanext-odn-theme.tar.gz
+    pip install --upgrade --no-deps /usr/share/odn-simple/odn-ckan-commons/theme/ckanext-odn-theme.tar.gz
+    apache_restart
+    sleep 2
     deactivate
     echo "<< "
 }
@@ -338,7 +349,9 @@ set_unifiedviews() {
     sed -i "s/#cas.security.check.url=.*/cas.security.check.url=\/unifiedviews\/login\/cas/" $FRONTEND_PROPS
     sed -i "s/#cas.login.url=.*/cas.login.url=https:\/\/$HOSTNAME\/cas\/login/" $FRONTEND_PROPS
     sed -i "s/#cas.logout.url=.*/cas.logout.url=https:\/\/$HOSTNAME\/cas\/logout/" $FRONTEND_PROPS
-    
+	sed -i "s/#external.menu.link.name.*/external.menu.link.name=CKAN catalog/" $FRONTEND_PROPS
+    sed -i "s/#external.menu.link.url.*/external.menu.link.url=http:\/\/$HOSTNAME\/internalcatalog/" $FRONTEND_PROPS
+
     sh /usr/share/unifiedviews/dist/plugins/deploy-dpus.sh
     sh /usr/share/unifiedviews/dist/odn_plugins/deploy-dpus.sh   
  
@@ -543,7 +556,7 @@ case "$1" in
     if [ "$ret" = "$UPGRADE" ] ; then
         upgrade
     fi
-  
+    
     hostname=$(get_hostname)
     solr_admin_restrict
     invoke-rc.d odn-solr restart
@@ -554,6 +567,10 @@ case "$1" in
     token=$(generate_token)
     # prerequisites {
     install_theme
+    ret=`dpkg --compare-versions $VERSION lt 1.2.0  > /dev/null 2>&1 && echo $UPGRADE` || true 
+    if [ "$ret" = "$UPGRADE" ] ; then
+         ckan_plugin_sync_migrate odn-ckan-ic
+    fi    
     #} 
     # odn-ckan-ic {
     set_ckans_hostname odn-ckan-ic $hostname

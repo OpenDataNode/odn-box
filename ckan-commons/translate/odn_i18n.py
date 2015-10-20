@@ -40,7 +40,6 @@ def find_po_files(path, to_merge_localizations):
             else:
                 to_merge_localizations[locale] = set(localization.po_paths)
 
-
 def create_localization(locale, parent_dir):
     dir = template_locale_path.format(PATH=parent_dir, locale=locale, po_file='')
     po_files = []
@@ -115,7 +114,7 @@ def main():
     the {LOCALE} should be the localization string e.g. fr'
 
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('--translation_file', dest='translation_file', help='Where file *.po is placed', required=False,
+    parser.add_argument('--translation_file', dest='translation_file', help='Where file *.po is placed for sk localization', required=False,
                         type=file)
 
     try:
@@ -123,16 +122,12 @@ def main():
 
         ckan_i18n_paths = []
         to_merge_localizations = {}
-        
-        if args.translation_file is not None:
-            to_merge_localizations = {'sk': [str(args.translation_file.name)]}
-         
 
         for distr in pip.get_installed_distributions():
             path = distr.location
             version = distr.version
             name = distr.key
-
+            
             if extension_string in name:
                 find_po_files(path, to_merge_localizations)
                 print 'odn ckanext found: {0} : {1}'.format(name, version)
@@ -146,9 +141,16 @@ def main():
         elif len(ckan_i18n_paths) == 0:
             print "No CKAN found"
         else:
+            print "Installing found localization"
             for ckan_path in ckan_i18n_paths:
                 install_localization(ckan_path, to_merge_localizations)
 
+        if args.translation_file is not None:
+            print "Installing sk localization from argument"
+            for ckan_path in ckan_i18n_paths:
+                to_merge_localizations = {'sk': [str(args.translation_file.name)]}
+                install_localization(ckan_path, to_merge_localizations)
+         
     except Exception as e:
         print e
         return -1

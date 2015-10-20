@@ -67,3 +67,7 @@ msgstr "zmazaný"
 
 msgid "pending"
 msgstr "čakajúci na schválenie"
+
+# Header - Tools button in navigation tabs
+msgid "Unified Views"
+msgstr "Transformačný modul"

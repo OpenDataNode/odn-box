@@ -352,7 +352,6 @@ set_unifiedviews() {
 	sed -i "s/#external.menu.link.name.*/external.menu.link.name=CKAN catalog/" $FRONTEND_PROPS
     sed -i "s/#external.menu.link.url.*/external.menu.link.url=http:\/\/$HOSTNAME\/internalcatalog/" $FRONTEND_PROPS
 
-    sh /usr/share/unifiedviews/dist/plugins/deploy-dpus.sh
     sh /usr/share/unifiedviews/dist/odn_plugins/deploy-dpus.sh   
  
     # remove deprected parameter and correct one in backend

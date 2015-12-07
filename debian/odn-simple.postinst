@@ -187,13 +187,13 @@ set_virtuoso() {
 }
 
 get_hostname() {
-    HOSTNAME=`hostname --all-fqdns`
-    if [ -z ${HOSTNAME}  ]
+    HOSTNAME=`hostname -f`
+    if [ -z "${HOSTNAME}"  ]
     then
         HOSTNAME=`hostname`
     fi
 
-    if [ -z ${HOSTNAME}  ] 
+    if [ -z "${HOSTNAME}"  ] 
     then
         HOSTNAME="localhost"
     fi

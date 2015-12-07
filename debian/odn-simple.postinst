@@ -364,6 +364,22 @@ set_unifiedviews() {
 		echo "org.opendatanode.CKAN.http.header.X-Forwarded-Proto = https" >> $BACKEND_PROPS
     fi
     
+    if ! grep -q "dpu.l-rdfToVirtuoso.username" $BACKEND_PROPS ; then
+  		echo "dpu.l-rdfToVirtuoso.username = dba" >> $BACKEND_PROPS
+    fi
+    
+    if ! grep -q "dpu.l-rdfToVirtuoso.password" $BACKEND_PROPS ; then
+  		echo "dpu.l-rdfToVirtuoso.password = dba" >> $BACKEND_PROPS
+    fi
+    
+    if ! grep -q "dpu.l-rdfToVirtuoso.jdbc.url" $BACKEND_PROPS ; then
+  		echo "dpu.l-rdfToVirtuoso.jdbc.url =  jdbc:virtuoso://localhost:1111/charset=UTF-8/" >> $BACKEND_PROPS
+    fi
+    
+    if ! grep -q "dpu.uv-l-rdfToVirtuosoAndCkan.dataset.uri.pattern" $BACKEND_PROPS ; then
+  		echo "dpu.uv-l-rdfToVirtuosoAndCkan.dataset.uri.pattern = https://$HOSTNAME/internalcatalog/dataset/${id}" >> $BACKEND_PROPS
+    fi
+    
     # remove correct parameter in backend
     if grep -q "dpu.uv-l-rdfToCkan.catalog" $BACKEND_PROPS ; then
         echo "uv-l-rdfToCkan update config"

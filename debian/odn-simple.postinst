@@ -187,13 +187,13 @@ set_virtuoso() {
 }
 
 get_hostname() {
-    HOSTNAME=`hostname --all-fqdns`
-    if [ -z ${HOSTNAME}  ]
+    HOSTNAME=`hostname -f`
+    if [ -z "${HOSTNAME}"  ]
     then
         HOSTNAME=`hostname`
     fi
 
-    if [ -z ${HOSTNAME}  ] 
+    if [ -z "${HOSTNAME}"  ] 
     then
         HOSTNAME="localhost"
     fi
@@ -362,6 +362,22 @@ set_unifiedviews() {
 		sed -i "s/dpu.uv-l-filesToCkan.secret.token/org.opendatanode.CKAN.secret.token/" $BACKEND_PROPS
 		echo "org.opendatanode.CKAN.http.header.X-Forwarded-Host = $HOSTNAME" >> $BACKEND_PROPS
 		echo "org.opendatanode.CKAN.http.header.X-Forwarded-Proto = https" >> $BACKEND_PROPS
+    fi
+    
+    if ! grep -q "dpu.l-rdfToVirtuoso.username" $BACKEND_PROPS ; then
+  		echo "dpu.l-rdfToVirtuoso.username = dba" >> $BACKEND_PROPS
+    fi
+    
+    if ! grep -q "dpu.l-rdfToVirtuoso.password" $BACKEND_PROPS ; then
+  		echo "dpu.l-rdfToVirtuoso.password = dba" >> $BACKEND_PROPS
+    fi
+    
+    if ! grep -q "dpu.l-rdfToVirtuoso.jdbc.url" $BACKEND_PROPS ; then
+  		echo "dpu.l-rdfToVirtuoso.jdbc.url =  jdbc:virtuoso://localhost:1111/charset=UTF-8/" >> $BACKEND_PROPS
+    fi
+    
+    if ! grep -q "dpu.uv-l-rdfToVirtuosoAndCkan.dataset.uri.pattern" $BACKEND_PROPS ; then
+  		echo "dpu.uv-l-rdfToVirtuosoAndCkan.dataset.uri.pattern = https://$HOSTNAME/internalcatalog/dataset/${id}" >> $BACKEND_PROPS
     fi
     
     # remove correct parameter in backend

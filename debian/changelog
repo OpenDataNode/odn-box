@@ -1,3 +1,9 @@
+odn-simple (1.2.3) stable; urgency=low
+
+  * Bugfix release version. See github for more information
+
+ -- jmc <jan.marcek@eea.sk>  Mon, 14 Dec 2015 08:37:22 +0100
+
 odn-simple (1.2.2) stable; urgency=low
 
   * Bugfix release version

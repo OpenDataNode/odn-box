@@ -178,7 +178,7 @@ set_virtuoso() {
             if [ -x /usr/sbin/invoke-rc.d ]; then
                     invoke-rc.d virtuoso-opensource-7  restart || true
             else
-                    /etc/init.d/virtuoso-opensource-7  restart || true
+                   service virtuoso-opensource-7  restart || true
             fi
      fi
      

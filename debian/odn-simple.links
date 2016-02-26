@@ -1,5 +1,4 @@
-etc/odn-simple/odn-ckan-ic/apache.conf etc/apache2/sites-available/odn-ckan-ic
-etc/odn-simple/odn-ckan-pc/apache.conf etc/apache2/sites-available/odn-ckan-pc
-etc/odn-simple/odn-simple-apache.conf etc/apache2/sites-available/odn-simple
-etc/odn-simple/odn-simple-ssl-apache.conf etc/apache2/sites-available/odn-simple-ssl
-
+etc/odn-simple/odn-ckan-ic/apache.conf etc/apache2/sites-available/odn-ckan-ic.conf 
+etc/odn-simple/odn-ckan-pc/apache.conf etc/apache2/sites-available/odn-ckan-pc.conf 
+etc/odn-simple/odn-simple-apache.conf etc/apache2/sites-available/odn-simple.conf 
+etc/odn-simple/odn-simple-ssl-apache.conf etc/apache2/sites-available/odn-simple-ssl.conf 

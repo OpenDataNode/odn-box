@@ -518,7 +518,8 @@ set_apache() {
         -e "s/\$HOSTNAME/$HOSTNAME/" \
         /etc/odn-simple/odn-ckan-pc/apache.conf 
         
-  a2dissite default
+  a2dissite default || true
+  a2dissite 000-default || true
   a2ensite odn-simple
   a2ensite odn-simple-ssl
   a2ensite odn-ckan-pc

@@ -52,6 +52,14 @@ case "$1" in
     a2dissite odn-ckan-pc || true
     a2dissite odn-ckan-ic || true
 
+    apache_files="/etc/apache2/sites-available/odn-ckan-ic* /etc/apache2/sites-available/odn-ckan-pc*   /etc/apache2/sites-available/odn-simple-ssl* /etc/apache2/sites-available/odn-simple*"
+    for file in $apache_files
+        do
+            if [ -h  "$file"  ]; then
+                unlink "$file" | true
+            fi
+     done
+    
     # reload default apache2 configuration
     if [ -x "/etc/init.d/apache2" ]; then
         invoke-rc.d apache2 restart || true

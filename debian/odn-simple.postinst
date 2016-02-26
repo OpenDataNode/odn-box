@@ -1,6 +1,10 @@
 #!/bin/sh
 set -e
 
+DEBIAN_8_VERSION="8.0"
+ACTUAL_VERSION=$(lsb_release -r -s)
+IS_DEBIAN_8=$(echo "${ACTUAL_VERSION} >= ${DEBIAN_8_VERSION}" | bc -l)
+
 db_up() {
   echo ">> db_up"
 
@@ -322,21 +326,27 @@ add_user_system() {
   
 }
 
+
 fix_python() {
-# fix problems
 echo ">> fix_python"
-# https://bugs.launchpad.net/ubuntu/+source/python2.7/+bug/1115466
-TARGET=$(ls /usr/lib/python2.7/plat-*/_sysconfigdata_nd.py)
-NAME_DIR="/usr/lib/python2.7"
-NAME=$NAME_DIR"/_sysconfigdata_nd.py"
 
-if [ -e $TARGET ] && [ -d $NAME_DIR ] && [ ! -e $NAME ] ; then
-    ln -s /usr/lib/python2.7/plat-*/_sysconfigdata_nd.py $NAME || true
+if  [ "$IS_DEBIAN_8" -eq 1 ] ; then
+    echo "jessie - distribution"
+    set +e
+    TARGET=$(ls /usr/lib/python2.7/plat-*/_sysconfigdata_nd.py)
+    set -e
+    NAME_DIR="/usr/lib/python2.7"
+    NAME=$NAME_DIR"/_sysconfigdata_nd.py"
+
+    if [ -e "$TARGET" ] && [ -d "$NAME_DIR" ] && [ ! -e "$NAME" ] ; then
+        # https://bugs.launchpad.net/ubuntu/+source/python2.7/+bug/1115466
+        ln -s /usr/lib/python2.7/plat-*/_sysconfigdata_nd.py "$NAME" || true
+    fi
+
+    # http://stackoverflow.com/questions/28987891/patch-pyopenssl-for-sslv3-issue
+    . /usr/share/python/odn-ckan-shared/bin/activate
+    pip install requests==2.6.0
 fi
-
-# http://stackoverflow.com/questions/28987891/patch-pyopenssl-for-sslv3-issue
-. /usr/share/python/odn-ckan-shared/bin/activate
-pip install requests==2.6.0
 
 echo "<< fix_python"
 }
@@ -501,6 +511,19 @@ set_midpoint() {
 set_apache() {
   echo ">> set_apache hostname: $1"
   HOSTNAME=$1
+  
+  if  [ "$IS_DEBIAN_8" -eq 1 ] ; then
+      ln -s /etc/odn-simple/odn-ckan-ic/apache.conf /etc/apache2/sites-available/odn-ckan-ic.conf  || true
+      ln -s /etc/odn-simple/odn-ckan-pc/apache.conf /etc/apache2/sites-available/odn-ckan-pc.conf  || true 
+      ln -s /etc/odn-simple/odn-simple-apache.conf /etc/apache2/sites-available/odn-simple.conf   || true
+      ln -s /etc/odn-simple/odn-simple-ssl-apache.conf /etc/apache2/sites-available/odn-simple-ssl.conf  || true 
+  else 
+      ln -s /etc/odn-simple/odn-ckan-ic/apache.conf /etc/apache2/sites-available/odn-ckan-ic  || true 
+      ln -s /etc/odn-simple/odn-ckan-pc/apache.conf /etc/apache2/sites-available/odn-ckan-pc  || true
+      ln -s /etc/odn-simple/odn-simple-apache.conf /etc/apache2/sites-available/odn-simple  || true
+      ln -s /etc/odn-simple/odn-simple-ssl-apache.conf /etc/apache2/sites-available/odn-simple-ssl  || true
+  fi
+
   
   sed --in-place \
         -e "s/\$HOSTNAME/$HOSTNAME/" \

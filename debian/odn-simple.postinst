@@ -179,11 +179,7 @@ set_virtuoso() {
    sed --in-place 's/= 1111/= 127.0.0.1:1111/g' $VIRTUOSO_CONFIG 
  
      if [ -x "/etc/init.d/virtuoso-opensource-7" ]; then
-            if [ -x /usr/sbin/invoke-rc.d ]; then
-                    invoke-rc.d virtuoso-opensource-7  restart || true
-            else
-                   service virtuoso-opensource-7  restart || true
-            fi
+        service virtuoso-opensource-7  restart || true
      fi
      
     add_user_system

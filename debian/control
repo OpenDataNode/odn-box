@@ -1,8 +1,8 @@
 Source: odn-simple
-Maintainer: Someone FIXME <dev@opendata.sk>
+Maintainer: jan.marcek@eea.sk
 Standards-Version: 3.9.3
 Build-Depends: debhelper (>= 9)
-Homepage: http://opendata.sk
+Homepage: http://opendatanode.org/
 Vcs-Git: https://github.com/OpenDataNode/odn-box.git
 
 Package: odn-simple

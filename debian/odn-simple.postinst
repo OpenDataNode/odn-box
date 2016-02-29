@@ -178,9 +178,10 @@ set_virtuoso() {
    sed --in-place 's/= 8890/= 127.0.0.1:8890/g' $VIRTUOSO_CONFIG
    sed --in-place 's/= 1111/= 127.0.0.1:1111/g' $VIRTUOSO_CONFIG 
  
-     if [ -x "/etc/init.d/virtuoso-opensource-7" ]; then
-        service virtuoso-opensource-7  restart || true
-     fi
+   if [ -x "/etc/init.d/virtuoso-opensource-7" ]; then
+        service virtuoso-opensource-7  stop || true
+        service virtuoso-opensource-7  start || true
+   fi
      
     add_user_system
     echo "<< "

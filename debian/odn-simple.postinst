@@ -173,13 +173,19 @@ apache_restart() {
 
 set_virtuoso() {
    echo ">> set_virtuoso"
+   if [ -x "/etc/init.d/virtuoso-opensource-7" ]; then
+        echo "stop virtuoso"
+        service virtuoso-opensource-7  stop || true
+        sleep 1
+   fi
+
    VIRTUOSO_CONFIG=/etc/virtuoso-opensource-7/virtuoso.ini 
    sed --in-place "s/\(DirsAllowed.*= \., .*\)/\1, \/var\/cache\/virtuoso\/upload/g"  $VIRTUOSO_CONFIG
    sed --in-place 's/= 8890/= 127.0.0.1:8890/g' $VIRTUOSO_CONFIG
    sed --in-place 's/= 1111/= 127.0.0.1:1111/g' $VIRTUOSO_CONFIG 
  
    if [ -x "/etc/init.d/virtuoso-opensource-7" ]; then
-        service virtuoso-opensource-7  stop || true
+        echo "start virtuoso"
         service virtuoso-opensource-7  start || true
    fi
      

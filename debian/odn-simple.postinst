@@ -1,6 +1,10 @@
 #!/bin/sh
 set -e
 
+DEBIAN_8_VERSION="8.0"
+ACTUAL_VERSION=$(lsb_release -r -s)
+IS_DEBIAN_8=$(echo "${ACTUAL_VERSION} >= ${DEBIAN_8_VERSION}" | bc -l)
+
 db_up() {
   echo ">> db_up"
 
@@ -169,18 +173,21 @@ apache_restart() {
 
 set_virtuoso() {
    echo ">> set_virtuoso"
+   if [ -x "/etc/init.d/virtuoso-opensource-7" ]; then
+        echo "stop virtuoso"
+        service virtuoso-opensource-7  stop || true
+        sleep 1
+   fi
+
    VIRTUOSO_CONFIG=/etc/virtuoso-opensource-7/virtuoso.ini 
    sed --in-place "s/\(DirsAllowed.*= \., .*\)/\1, \/var\/cache\/virtuoso\/upload/g"  $VIRTUOSO_CONFIG
    sed --in-place 's/= 8890/= 127.0.0.1:8890/g' $VIRTUOSO_CONFIG
    sed --in-place 's/= 1111/= 127.0.0.1:1111/g' $VIRTUOSO_CONFIG 
  
-     if [ -x "/etc/init.d/virtuoso-opensource-7" ]; then
-            if [ -x /usr/sbin/invoke-rc.d ]; then
-                    invoke-rc.d virtuoso-opensource-7  restart || true
-            else
-                    /etc/init.d/virtuoso-opensource-7  restart || true
-            fi
-     fi
+   if [ -x "/etc/init.d/virtuoso-opensource-7" ]; then
+        echo "start virtuoso"
+        service virtuoso-opensource-7  start || true
+   fi
      
     add_user_system
     echo "<< "
@@ -320,6 +327,31 @@ add_user_system() {
   
   echo "<< "
   
+}
+
+
+fix_python() {
+echo ">> fix_python"
+
+if  [ "$IS_DEBIAN_8" -eq 1 ] ; then
+    echo "jessie - distribution"
+    set +e
+    TARGET=$(ls /usr/lib/python2.7/plat-*/_sysconfigdata_nd.py)
+    set -e
+    NAME_DIR="/usr/lib/python2.7"
+    NAME=$NAME_DIR"/_sysconfigdata_nd.py"
+
+    if [ -e "$TARGET" ] && [ -d "$NAME_DIR" ] && [ ! -e "$NAME" ] ; then
+        # https://bugs.launchpad.net/ubuntu/+source/python2.7/+bug/1115466
+        ln -s /usr/lib/python2.7/plat-*/_sysconfigdata_nd.py "$NAME" || true
+    fi
+
+    # http://stackoverflow.com/questions/28987891/patch-pyopenssl-for-sslv3-issue
+    . /usr/share/python/odn-ckan-shared/bin/activate
+    pip install requests==2.6.0
+fi
+
+echo "<< fix_python"
 }
 
 install_theme() {
@@ -483,6 +515,19 @@ set_apache() {
   echo ">> set_apache hostname: $1"
   HOSTNAME=$1
   
+  if  [ "$IS_DEBIAN_8" -eq 1 ] ; then
+      ln -s /etc/odn-simple/odn-ckan-ic/apache.conf /etc/apache2/sites-available/odn-ckan-ic.conf  || true
+      ln -s /etc/odn-simple/odn-ckan-pc/apache.conf /etc/apache2/sites-available/odn-ckan-pc.conf  || true 
+      ln -s /etc/odn-simple/odn-simple-apache.conf /etc/apache2/sites-available/odn-simple.conf   || true
+      ln -s /etc/odn-simple/odn-simple-ssl-apache.conf /etc/apache2/sites-available/odn-simple-ssl.conf  || true 
+  else 
+      ln -s /etc/odn-simple/odn-ckan-ic/apache.conf /etc/apache2/sites-available/odn-ckan-ic  || true 
+      ln -s /etc/odn-simple/odn-ckan-pc/apache.conf /etc/apache2/sites-available/odn-ckan-pc  || true
+      ln -s /etc/odn-simple/odn-simple-apache.conf /etc/apache2/sites-available/odn-simple  || true
+      ln -s /etc/odn-simple/odn-simple-ssl-apache.conf /etc/apache2/sites-available/odn-simple-ssl  || true
+  fi
+
+  
   sed --in-place \
         -e "s/\$HOSTNAME/$HOSTNAME/" \
          /etc/odn-simple/odn-simple-apache.conf
@@ -499,7 +544,8 @@ set_apache() {
         -e "s/\$HOSTNAME/$HOSTNAME/" \
         /etc/odn-simple/odn-ckan-pc/apache.conf 
         
-  a2dissite default
+  a2dissite default || true
+  a2dissite 000-default || true
   a2ensite odn-simple
   a2ensite odn-simple-ssl
   a2ensite odn-ckan-pc
@@ -581,6 +627,7 @@ case "$1" in
     db_up
     token=$(generate_token)
     # prerequisites {
+    fix_python
     install_theme
     ret=`dpkg --compare-versions $VERSION lt 1.2.0  > /dev/null 2>&1 && echo $UPGRADE` || true 
     if [ "$ret" = "$UPGRADE" ] ; then

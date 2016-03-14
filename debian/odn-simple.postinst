@@ -514,19 +514,21 @@ set_midpoint() {
 set_apache() {
   echo ">> set_apache hostname: $1"
   HOSTNAME=$1
-  
-  if  [ "$IS_DEBIAN_8" -eq 1 ] ; then
-      ln -s /etc/odn-simple/odn-ckan-ic/apache.conf /etc/apache2/sites-available/odn-ckan-ic.conf  || true
-      ln -s /etc/odn-simple/odn-ckan-pc/apache.conf /etc/apache2/sites-available/odn-ckan-pc.conf  || true 
-      ln -s /etc/odn-simple/odn-simple-apache.conf /etc/apache2/sites-available/odn-simple.conf   || true
-      ln -s /etc/odn-simple/odn-simple-ssl-apache.conf /etc/apache2/sites-available/odn-simple-ssl.conf  || true 
-  else 
-      ln -s /etc/odn-simple/odn-ckan-ic/apache.conf /etc/apache2/sites-available/odn-ckan-ic  || true 
-      ln -s /etc/odn-simple/odn-ckan-pc/apache.conf /etc/apache2/sites-available/odn-ckan-pc  || true
-      ln -s /etc/odn-simple/odn-simple-apache.conf /etc/apache2/sites-available/odn-simple  || true
-      ln -s /etc/odn-simple/odn-simple-ssl-apache.conf /etc/apache2/sites-available/odn-simple-ssl  || true
-  fi
+  VAR="ok"
+  APACHE_VERSION=`dpkg -l | grep apache2.2-bin |  awk '{ print $3 }'`
 
+  ret=`dpkg --compare-versions $APACHE_VERSION ge 2.2 && dpkg --compare-versions $APACHE_VERSION lt 2.4 > /dev/null 2>&1 && echo $VAR` || true 
+  if [ "$ret" = "$VAR" ] ; then
+    ln -s /etc/odn-simple/odn-ckan-ic/apache.conf /etc/apache2/sites-available/odn-ckan-ic  || true 
+    ln -s /etc/odn-simple/odn-ckan-pc/apache.conf /etc/apache2/sites-available/odn-ckan-pc  || true
+    ln -s /etc/odn-simple/odn-simple-apache.conf /etc/apache2/sites-available/odn-simple  || true
+    ln -s /etc/odn-simple/odn-simple-ssl-apache.conf /etc/apache2/sites-available/odn-simple-ssl  || true
+  else 
+    ln -s /etc/odn-simple/odn-ckan-ic/apache.conf /etc/apache2/sites-available/odn-ckan-ic.conf  || true 
+    ln -s /etc/odn-simple/odn-ckan-pc/apache.conf /etc/apache2/sites-available/odn-ckan-pc.conf  || true
+    ln -s /etc/odn-simple/odn-simple-apache.conf /etc/apache2/sites-available/odn-simple.conf  || true
+    ln -s /etc/odn-simple/odn-simple-ssl-apache.conf /etc/apache2/sites-available/odn-simple-ssl.conf  || true
+  fi
   
   sed --in-place \
         -e "s/\$HOSTNAME/$HOSTNAME/" \

@@ -10,7 +10,7 @@ Architecture: all
 Priority: extra
 Section: web
 Depends: postgresql, apache2-mpm-worker, libapache2-mod-wsgi, python-pip, gettext, curl, bc, lsb-release,
-    unifiedviews-pgsql (>= 2.2), unifiedviews-pgsql (<< 2.3),
+    unifiedviews-pgsql (>= 2.3), unifiedviews-pgsql (<< 2.4),
     odn-midpoint (>= 3.4-odn1.2), odn-midpoint (<< 3.5-odn1.3),
     odn-cas (>= 1.1), odn-cas (<< 1.2),
     odn-solr (>= 4.10.2-odn1.0), odn-solr (<< 4.10.2-odn1.2),

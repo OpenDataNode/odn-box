@@ -612,6 +612,8 @@ activate_midpoint_sso() {
          
    ln -s  /etc/odn-simple/odn-midpoint/ctx-web-security.xml  /usr/share/odn-midpoint/midpoint/WEB-INF/ctx-web-security.xml 
    ln -s  /etc/odn-simple/odn-midpoint/web.xml  /usr/share/odn-midpoint/midpoint/WEB-INF/web.xml
+ 
+   invoke-rc.d odn-midpoint restart
    echo "<< activate_midpoint_sso"
 }
 

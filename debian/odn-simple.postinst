@@ -486,28 +486,17 @@ set_midpoint() {
   curl --user administrator:5ecr3t -H "Content-Type: application/xml" -X PUT http://localhost:18080/midpoint/ws/rest/users/11111111-0000-0000-0000-000000000001 -d @/usr/share/odn-midpoint/initial-objects/205-user-cas-admin.xml -v
   #}
   
-  if [ -h /usr/share/odn-midpoint/midpoint/WEB-INF/ctx-web-security.xml  ] ; then 
-    unlink /usr/share/odn-midpoint/midpoint/WEB-INF/ctx-web-security.xml
-  fi
-  
-  if [ -h /usr/share/odn-midpoint/midpoint/WEB-INF/web.xml  ] ; then 
-    unlink /usr/share/odn-midpoint/midpoint/WEB-INF/web.xml
-  fi
-  
   # set domain name  
   sed --in-place \
         -e "s/\$HOSTNAME/$HOSTNAME/" \
          /etc/odn-simple/odn-midpoint/ctx-web-security.xml 
-  
-  ln -s  /etc/odn-simple/odn-midpoint/ctx-web-security.xml  /usr/share/odn-midpoint/midpoint/WEB-INF/ctx-web-security.xml 
-  ln -s  /etc/odn-simple/odn-midpoint/web.xml  /usr/share/odn-midpoint/midpoint/WEB-INF/web.xml
-  
+
   chown -R odn-midpoint /etc/odn-simple/odn-midpoint
   chown -R odn-midpoint /usr/share/odn-midpoint/midpoint/WEB-INF/web.xml 
   chown -R odn-midpoint /usr/share/odn-midpoint/midpoint/WEB-INF/ctx-web-security.xml
   chown -R odn-midpoint /var/lib/midpoint.home/
-    
-  invoke-rc.d odn-midpoint restart
+  activate_midpoint_sso    
+  
   echo "<< set_midpoint"
 }
 
@@ -610,6 +599,24 @@ activate_unifiedviews_sso() {
    echo "<< activate_unifiedviews_sso"
 }
 
+activate_midpoint_sso() {
+   echo ">> activate_midpoint_sso"
+   if [ -h /usr/share/odn-midpoint/midpoint/WEB-INF/ctx-web-security.xml  ] ; then 
+    unlink /usr/share/odn-midpoint/midpoint/WEB-INF/ctx-web-security.xml
+    fi
+  
+   if [ -h /usr/share/odn-midpoint/midpoint/WEB-INF/web.xml  ] ; then 
+    unlink /usr/share/odn-midpoint/midpoint/WEB-INF/web.xml
+   fi
+         
+   ln -s  /etc/odn-simple/odn-midpoint/ctx-web-security.xml  /usr/share/odn-midpoint/midpoint/WEB-INF/ctx-web-security.xml 
+   ln -s  /etc/odn-simple/odn-midpoint/web.xml  /usr/share/odn-midpoint/midpoint/WEB-INF/web.xml
+ 
+   invoke-rc.d odn-midpoint restart
+   echo "<< activate_midpoint_sso"
+}
+
+
 case "$1" in
   configure)
     VERSION=$2
@@ -674,11 +681,20 @@ case "$1" in
   abort-upgrade|abort-remove|abort-deconfigure)
   ;;
   triggered)
-    echo "triggered: change unifiedviews configuration"
-    activate_unifiedviews_sso
-    
+    shift;
+    for i in "$@"; do
+        case "$i" in
+        "/usr/share/unifiedviews/frontend/WEB-INF") 
+           echo "triggered: change unifiedviews configuration"
+           activate_unifiedviews_sso
+        ;;
+        "/usr/share/odn-midpoint/midpoint/WEB-INF") 
+           echo "triggered: change midpoint configuration"
+           activate_midpoint_sso        
+        ;;
+        esac
+    done
     ;;
-
   *)
     echo "$0 called with unknown argument \`$1'" >&2
     exit 1

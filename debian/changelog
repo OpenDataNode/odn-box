@@ -1,20 +1,26 @@
+odn-simple (1.5.0) stable; urgency=low
+
+  * Stable release version. See github for more information
+
+ -- jmc <jan.marcek@eea.sk>  Mon, 20 July 2016 14:30:00 +0100
+
 odn-simple (1.4.0) stable; urgency=low
 
   * Stable release version. See github for more information
 
- -- jmc <jan.marcek@eea.sk>  Mon, 6 Jun 2015 09:30:00 +0100
+ -- jmc <jan.marcek@eea.sk>  Mon, 6 Jun 2016 09:30:00 +0100
 
 odn-simple (1.3.0) stable; urgency=low
 
   * Stable release version. See github for more information
 
- -- jmc <jan.marcek@eea.sk>  Wed, 18 May 2015 10:45:00 +0100
+ -- jmc <jan.marcek@eea.sk>  Wed, 18 May 2016 10:45:00 +0100
 
 odn-simple (1.2.4) stable; urgency=low
 
   * Bugfix release version. See github for more information
 
- -- jmc <jan.marcek@eea.sk>  Mon, 29 Feb 2015 13:45:00 +0100
+ -- jmc <jan.marcek@eea.sk>  Mon, 29 Feb 2016 13:45:00 +0100
 
 odn-simple (1.2.3) stable; urgency=low
 

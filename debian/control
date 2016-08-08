@@ -14,7 +14,7 @@ Depends: postgresql, apache2-mpm-worker, libapache2-mod-wsgi, python-pip, gettex
     odn-midpoint (>= 1:3.3-odn1.3.0), odn-midpoint (<< 1:3.4-odn1.4),
     odn-cas (>= 1.1), odn-cas (<< 1.2),
     odn-solr (>= 4.10.2-odn1.0), odn-solr (<< 4.10.2-odn1.2),
-    odn-ckan-shared (>= 2.3.2-odn1.3), odn-ckan-shared (<< 2.3.2-odn1.4),
+    odn-ckan-shared (>= 2.3.2-odn1.4), odn-ckan-shared (<< 2.3.2-odn1.5),
     odn-uv-plugins (>= 1.3), odn-uv-plugins (<< 1.4),
     virtuoso-opensource (>= 7.2), virtuoso-opensource (<< 7.3)
 Conflicts: odn-simple (<= 0.9-2)

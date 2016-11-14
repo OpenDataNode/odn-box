@@ -11,7 +11,7 @@ Priority: extra
 Section: web
 Depends: postgresql, apache2-mpm-worker, libapache2-mod-wsgi, python-pip, gettext, curl, bc, lsb-release,
     unifiedviews-pgsql (>= 2.3), unifiedviews-pgsql (<< 2.4),
-    odn-midpoint (>= 1:3.3-odn1.3.0), odn-midpoint (<< 1:3.4-odn1.4),
+    odn-midpoint (>= 1:3.3.1-odn1.6.0), odn-midpoint (<< 1:3.4-odn1.7),
     odn-cas (>= 1.1), odn-cas (<< 1.2),
     odn-solr (>= 4.10.2-odn1.0), odn-solr (<< 4.10.2-odn1.2),
     odn-ckan-shared (>= 2.3.2-odn1.6), odn-ckan-shared (<< 2.4.0-odn1.7),

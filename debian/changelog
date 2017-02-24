@@ -1,3 +1,9 @@
+odn-simple (1.6.2) stable; urgency=low
+
+  * Stable release version. See github for more information
+
+ -- Peter Hanecak <hanecak@opendata.sk>  Fri, February 24 2016 11:15:00 +0100
+
 odn-simple (1.6.0) stable; urgency=low
 
   * Stable release version. See github for more information
